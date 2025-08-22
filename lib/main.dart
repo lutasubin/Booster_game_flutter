@@ -1,8 +1,16 @@
 import 'package:booster_game/booster_app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
-  runApp(const BoosterApp());
+  //for setting orientation to portrait only
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((v) {
+    runApp(const BoosterApp());
+  });
 }

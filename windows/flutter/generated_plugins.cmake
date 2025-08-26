@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  firebase_core
   flutter_volume_controller
   permission_handler_windows
   screen_brightness_windows

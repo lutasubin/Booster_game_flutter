@@ -1,9 +1,41 @@
 import 'package:booster_game/controller/mode_setting_controller/mode_setting_controller.dart';
+import 'package:booster_game/controller/native_controller/native_controller.dart';
+import 'package:booster_game/helper/gg_ads/ads_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-class ModeSettingScreen extends StatelessWidget {
+class ModeSettingScreen extends StatefulWidget {
   const ModeSettingScreen({super.key});
+
+  @override
+  State<ModeSettingScreen> createState() => _ModeSettingScreenState();
+}
+
+class _ModeSettingScreenState extends State<ModeSettingScreen> {
+  final _adController2 = NativeAdController();
+  bool _adInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Chỉ tạo ad một lần khi initState
+    _initializeAd();
+  }
+
+  void _initializeAd() {
+    if (!_adInitialized) {
+      _adController2.ad = AdHelper.loadNativeAd(adController: _adController2);
+      _adInitialized = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    // Dispose ad khi widget bị destroy
+    _adController2.ad?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,21 +64,31 @@ class ModeSettingScreen extends StatelessWidget {
             letterSpacing: 1.5,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => controller.saveSettings(),
-            child: const Text(
-              'SAVE',
-              style: TextStyle(
-                color: Color(0xFF00FFB3),
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ),
-        ],
       ),
+
+      bottomNavigationBar: Obx(() {
+        return _adController2.ad != null && _adController2.adLoaded.isTrue
+            ? SafeArea(
+              child: SizedBox(
+                height: 120,
+                child: AdWidget(
+                  key: ValueKey(_adController2.ad.hashCode),
+                  ad: _adController2.ad!,
+                ),
+              ),
+            )
+            : Container(
+              height: 120,
+              // ignore: deprecated_member_use
+              color: Colors.blue.withOpacity(0.1),
+              child: Center(
+                child: Text(
+                  'Ads Loading...',
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ),
+            );
+      }),
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
@@ -85,9 +127,10 @@ class ModeSettingScreen extends StatelessWidget {
                     max: 100,
                     divisions: 100,
                     label: '${controller.brightnessLevel.value.round()}%',
-                    onChanged: controller.brightnessEnabled.value
-                        ? (val) => controller.updateBrightness(val)
-                        : null,
+                    onChanged:
+                        controller.brightnessEnabled.value
+                            ? (val) => controller.updateBrightness(val)
+                            : null,
                   ),
                 ),
               ],
@@ -130,9 +173,10 @@ class ModeSettingScreen extends StatelessWidget {
                     max: 100,
                     divisions: 100,
                     label: '${controller.ringtoneVolume.value.round()}%',
-                    onChanged: controller.ringtoneEnabled.value
-                        ? (val) => controller.updateRingtoneVolume(val)
-                        : null,
+                    onChanged:
+                        controller.ringtoneEnabled.value
+                            ? (val) => controller.updateRingtoneVolume(val)
+                            : null,
                   ),
                 ),
               ],
@@ -159,8 +203,8 @@ class ModeSettingScreen extends StatelessWidget {
                     inactiveTrackColor: const Color(0xFF25252B),
                     activeTrackColor: Color(0xFF00FFB3),
                     title: Text(
-                      'Media (System Volume)', 
-                      style: TextStyle(color: Colors.white)
+                      'Media (System Volume)',
+                      style: TextStyle(color: Colors.white),
                     ),
                     value: controller.mediaEnabled.value,
                     onChanged: (val) => controller.toggleMedia(val),
@@ -176,9 +220,10 @@ class ModeSettingScreen extends StatelessWidget {
                     max: 100,
                     divisions: 100,
                     label: '${controller.mediaVolume.value.round()}%',
-                    onChanged: controller.mediaEnabled.value
-                        ? (val) => controller.updateMediaVolume(val)
-                        : null,
+                    onChanged:
+                        controller.mediaEnabled.value
+                            ? (val) => controller.updateMediaVolume(val)
+                            : null,
                   ),
                 ),
               ],
@@ -252,15 +297,16 @@ class ModeSettingScreen extends StatelessWidget {
           Obx(
             () => Wrap(
               spacing: 10,
-              children: [60, 90, 120, 144].map((fps) {
-                return ChoiceChip(
-                  label: Text('$fps Fps'),
-                  selected: controller.selectedFps.value == fps,
-                  onSelected: (val) {
-                    if (val) controller.selectedFps.value = fps;
-                  },
-                );
-              }).toList(),
+              children:
+                  [60, 90, 120, 144].map((fps) {
+                    return ChoiceChip(
+                      label: Text('$fps Fps'),
+                      selected: controller.selectedFps.value == fps,
+                      onSelected: (val) {
+                        if (val) controller.selectedFps.value = fps;
+                      },
+                    );
+                  }).toList(),
             ),
           ),
         ],

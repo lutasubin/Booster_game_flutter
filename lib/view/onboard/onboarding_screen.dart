@@ -1,5 +1,6 @@
 import 'package:booster_game/model/onboard.dart';
-import 'package:booster_game/view/welcome_game/welcome.dart';
+import 'package:booster_game/view/home/home_screen.dart';
+import 'package:booster_game/controller/splash_controller/splash_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +19,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   List<OnboardingItem> onboardingItems = [
     OnboardingItem(
       title: "POWERFUL PERFORMANCE",
-      subtitle: "Powerful performance boost giver you the best gaming experience",
+      subtitle:
+          "Powerful performance boost giver you the best gaming experience",
       assetImage: "assets/images/image1.png",
       buttonText: 'Next',
     ),
@@ -53,7 +55,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isSmallScreen = screenSize.height < 600;
 
     return Scaffold(
-        backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const Color(0xFF1A1A1A),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -118,7 +120,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                         style: TextStyle(
                                           fontSize: isSmallScreen ? 12 : 14,
                                           fontWeight: FontWeight.w500,
-                                          color: const Color(0xFFFFFFFF).withAlpha(179), // 0.7 opacity
+                                          color: const Color(
+                                            0xFFFFFFFF,
+                                          ).withAlpha(179), // 0.7 opacity
                                           height: 1.4,
                                         ),
                                       ),
@@ -140,9 +144,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 top: 20,
                 right: 20,
                 child: TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_currentPage == onboardingItems.length - 1) {
-                      Get.offAll(() => WelcomeScreen());
+                      // Đánh dấu đã hoàn thành onboarding
+                      await SplashController.markOnboardingCompleted();
+                      // Chuyển đến home screen
+                      Get.offAll(() => HomeScreen());
                     } else {
                       _pageController.nextPage(
                         duration: const Duration(milliseconds: 300),

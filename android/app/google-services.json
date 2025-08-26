@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "201281154378",
+    "project_id": "booster-game-c499f",
+    "storage_bucket": "booster-game-c499f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201281154378:android:1e5ae137c4e63c6c26e5b3",
+        "android_client_info": {
+          "package_name": "com.example.booster_game"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPioQClR4AR4YHxwkvLQOiZoHVSelmrKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

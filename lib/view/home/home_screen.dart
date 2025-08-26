@@ -1,4 +1,6 @@
 import 'package:booster_game/controller/home_controller/home_controller.dart';
+import 'package:booster_game/controller/native_controller/native_controller.dart';
+import 'package:booster_game/helper/gg_ads/ads_setup.dart';
 import 'package:booster_game/view/game_mode/game_mode.dart';
 import 'package:booster_game/view/home/circular.dart';
 import 'package:booster_game/view/mode_setting/mode_setting.dart';
@@ -6,9 +8,37 @@ import 'package:booster_game/view/setting/setting_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _adController = NativeAdController();
+  bool _adInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAd();
+  }
+
+  void _initializeAd() {
+    if (!_adInitialized) {
+      _adController.ad = AdHelper.loadNativeAd(adController: _adController);
+      _adInitialized = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _adController.ad?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +83,29 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: Obx(() {
+        return _adController.ad != null && _adController.adLoaded.isTrue
+            ? SafeArea(
+              child: SizedBox(
+                height: 120,
+                child: AdWidget(
+                  key: ValueKey(_adController.ad.hashCode),
+                  ad: _adController.ad!,
+                ),
+              ),
+            )
+            : Container(
+              height: 120,
+              // ignore: deprecated_member_use
+              color: Colors.blue.withOpacity(0.1),
+              child: Center(
+                child: Text(
+                  'Ads Loading...',
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ),
+            );
+      }),
       backgroundColor: const Color(0xFF1A1A1A),
       body: SafeArea(
         child: Padding(
@@ -173,7 +226,11 @@ class HomeScreen extends StatelessWidget {
                           const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
-                              Get.to(() => GameModeSelectionScreen());
+                              AdHelper.showInterstitialAd(
+                                onComplete: () {
+                                  Get.to(() => GameModeSelectionScreen());
+                                },
+                              );
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(

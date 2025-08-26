@@ -56,8 +56,8 @@ class WelcomeScreen extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.to(
-                        () => const HomeScreen(),
+                      Get.off(
+                        () =>  HomeScreen(),
                         transition: Transition.fade,
                         duration: const Duration(milliseconds: 500),
                       );

@@ -56,7 +56,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isSmallScreen = screenSize.height < 600;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+       backgroundColor: const  Color(0xFF18181B),
       bottomNavigationBar: NativeAdWithLoadingWidget(adType: 'medium',),
       body: Container(
         decoration: const BoxDecoration(

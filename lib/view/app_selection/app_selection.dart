@@ -39,7 +39,7 @@ class AppSelectionScreen extends StatelessWidget {
     return Scaffold(
       bottomNavigationBar: NativeAdWithLoadingWidget(adType: ''),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+          backgroundColor: const  Color(0xFF18181B),
         elevation: 0,
         leading: IconButton(
           icon: const Row(
@@ -63,7 +63,7 @@ class AppSelectionScreen extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: const Color(0xFF1A1A1A),
+       backgroundColor: const  Color(0xFF18181B),
       body: SafeArea(
         child: Column(
           children: [

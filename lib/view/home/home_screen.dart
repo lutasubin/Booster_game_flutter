@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final HomeController controller = Get.find<HomeController>();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: const  Color(0xFF18181B),
         title: // Gaming Mode Title
             const Row(
           children: [
@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const  Color(0xFF18181B),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -95,9 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(
-                    0xFF1A1A1A,
-                  ), // màu nền gần giống hình (xám đậm)
+                  color: const  Color(0xFF18181B), // màu nền gần giống hình (xám đậm)
 
                   border: Border.all(
                     // ignore: deprecated_member_use
@@ -111,21 +109,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Obx(
-                      () => _buildPerformanceCircle(
+                      () => GaugeCircle(
                         label: 'CPU',
                         percentage: controller.cpuUsage.round(),
                         color: const Color(0xFF00BFFF),
                       ),
                     ),
                     Obx(
-                      () => _buildPerformanceCircle(
+                      () =>  GaugeCircle(
                         label: 'RAM',
                         percentage: controller.ramUsage.round(),
                         color: const Color(0xFFFFD700),
                       ),
                     ),
                     Obx(
-                      () => _buildPerformanceCircle(
+                      () =>  GaugeCircle(
                         label: 'SPEED',
                         percentage: controller.speedScore.round(),
                         color: const Color(0xFF00FFB3),
@@ -141,9 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(
-                    0xFF1A1A1A,
-                  ), // màu nền gần giống hình (xám đậm)
+                  color: const  Color(0xFF18181B), // màu nền gần giống hình (xám đậm)
 
                   border: Border.all(
                     // ignore: deprecated_member_use
@@ -286,43 +282,43 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPerformanceCircle({
-    required String label,
-    required int percentage,
-    required Color color,
-  }) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 80,
-          height: 80,
-          child: CustomPaint(
-            painter: CircularProgressPainter(
-              progress: percentage / 100,
-              color: color,
-            ),
-            child: Center(
-              child: Text(
-                '$percentage%',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildPerformanceCircle({
+  //   required String label,
+  //   required int percentage,
+  //   required Color color,
+  // }) {
+  //   return Column(
+  //     children: [
+  //       SizedBox(
+  //         width: 80,
+  //         height: 80,
+  //         child: CustomPaint(
+  //           painter: CircularProgressPainter(
+  //             progress: percentage / 100,
+  //             color: color,
+  //           ),
+  //           child: Center(
+  //             child: Text(
+  //               '$percentage%',
+  //               style: const TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 14,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //       const SizedBox(height: 8),
+  //       Text(
+  //         label,
+  //         style: TextStyle(
+  //           color: Colors.grey[400],
+  //           fontSize: 12,
+  //           fontWeight: FontWeight.w500,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 }

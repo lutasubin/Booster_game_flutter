@@ -22,11 +22,11 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const Color(0xFF18181B),
       bottomNavigationBar: NativeAdWithLoadingWidget(adType: ''),
 
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: const Color(0xFF18181B),
         elevation: 0,
         leading: IconButton(
           icon: const Row(
@@ -126,7 +126,6 @@ class _MenuScreenState extends State<MenuScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         decoration: BoxDecoration(
           color: const Color(0xFF25252B),
-          borderRadius: BorderRadius.circular(8.0),
           border: Border.all(color: Colors.black12),
         ),
         child: Row(

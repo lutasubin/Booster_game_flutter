@@ -32,10 +32,10 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: NativeAdWithLoadingWidget(adType: 'medium',),
-      backgroundColor: const Color(0xFF1A1A1A),
+      bottomNavigationBar: NativeAdWithLoadingWidget(adType: 'medium'),
+      backgroundColor: const Color(0xFF18181B),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: const Color(0xFF18181B),
         elevation: 0,
         leading: IconButton(
           icon: const Row(
@@ -81,7 +81,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                               ? Color(0xFF00FFB3)
                               : Colors.grey.shade800,
                     ),
-                    color: Colors.grey.shade900,
+                    color: const Color(0xFF18181B),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

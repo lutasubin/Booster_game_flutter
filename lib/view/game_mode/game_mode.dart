@@ -303,7 +303,7 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const  Color(0xFF18181B),
       // bottomNavigationBar: const NativeAdWithLoadingWidget(adType: ''),
       body: Center(
         child: AnimatedSwitcher(
@@ -364,7 +364,7 @@ class _GameModeSelectionScreenState extends State<GameModeSelectionScreen>
       height: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color:    const  Color(0xFF18181B),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

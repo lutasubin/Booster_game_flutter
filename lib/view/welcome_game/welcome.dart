@@ -13,7 +13,7 @@ class WelcomeScreen extends StatelessWidget {
     final isSmallScreen = screenSize.height < 600;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const  Color(0xFF18181B),
       bottomNavigationBar: NativeAdWithLoadingWidget(adType: '',),
       body: Container(
         width: double.infinity,

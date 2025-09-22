@@ -1,59 +1,21 @@
+import 'package:booster_game/controller/app_selections_controller/app_controller.dart';
+import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
-import 'package:booster_game/controller/home_controller/home_controller.dart';
 
-class AppSelectionScreen extends StatefulWidget {
-  const AppSelectionScreen({super.key});
-
-  @override
-  State<AppSelectionScreen> createState() => _AppSelectionScreenState();
-}
-
-class _AppSelectionScreenState extends State<AppSelectionScreen> {
-  final HomeController controller = Get.find<HomeController>();
+class AppSelectionScreen extends StatelessWidget {
+  final controller = Get.find<AppSelectionController>();
   final TextEditingController searchController = TextEditingController();
 
-  // Danh sách apps để hiển thị (sau khi filter)
-  List<AppInfo> filteredApps = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeData();
-  }
-
-  void _initializeData() {
-    // Load tất cả installed apps nếu chưa có
-    if (controller.installedApps.isEmpty) {
-      controller.refreshApps();
-    }
-
-    // Khởi tạo filtered apps với tất cả apps
-    filteredApps = List.from(controller.installedApps);
-  }
-
-  void _filterApps(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredApps = List.from(controller.installedApps);
-      } else {
-        filteredApps =
-            controller.installedApps.where((app) {
-              return app.name.toLowerCase().contains(query.toLowerCase()) ||
-                  app.packageName.toLowerCase().contains(query.toLowerCase());
-            }).toList();
-      }
-    });
-  }
+  AppSelectionScreen({super.key});
 
   Future<void> _playGame(AppInfo app) async {
     try {
       await InstalledApps.startApp(app.packageName);
-
       Get.snackbar(
-        'Starting Game',
+        'Starting App',
         'Opening ${app.name}...',
         backgroundColor: const Color(0xFF00FFB3),
         colorText: Colors.black,
@@ -61,7 +23,6 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
         duration: const Duration(seconds: 2),
       );
     } catch (e) {
-      print('Error starting app: $e');
       Get.snackbar(
         'Error',
         'Cannot start ${app.name}',
@@ -76,6 +37,7 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: NativeAdWithLoadingWidget(adType: ''),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
@@ -89,22 +51,23 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
           ),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'SELECT APP',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
+        title: Obx(
+          () => Text(
+            controller.searchQuery.isEmpty ? 'SELECT GAME' : 'ALL APPS',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
       ),
       backgroundColor: const Color(0xFF1A1A1A),
       body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Bar
+            // Search bar
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -119,7 +82,7 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                   Expanded(
                     child: TextField(
                       controller: searchController,
-                      onChanged: _filterApps,
+                      onChanged: controller.filterApps,
                       style: const TextStyle(color: Colors.white, fontSize: 16),
                       decoration: const InputDecoration(
                         hintText: 'Search App',
@@ -136,26 +99,16 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
 
             const SizedBox(height: 16),
 
-            // Game List
+            // App list
             Expanded(
               child: Obx(() {
-                if (controller.isLoadingApps) {
+                if (controller.isLoading.value) {
                   return const Center(
                     child: CircularProgressIndicator(color: Color(0xFF00FFB3)),
                   );
                 }
 
-                // Cập nhật filteredApps khi controller thay đổi
-                if (filteredApps.isEmpty &&
-                    controller.installedApps.isNotEmpty) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    setState(() {
-                      filteredApps = List.from(controller.installedApps);
-                    });
-                  });
-                }
-
-                if (filteredApps.isEmpty) {
+                if (controller.filteredApps.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -163,18 +116,12 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                         Icon(Icons.apps, size: 64, color: Colors.grey[600]),
                         const SizedBox(height: 16),
                         Text(
-                          'No apps found',
+                          controller.searchQuery.isEmpty
+                              ? 'No games found'
+                              : 'No apps found',
                           style: TextStyle(
                             color: Colors.grey[400],
                             fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Loading installed apps...',
-                          style: TextStyle(
-                            color: Colors.grey[500],
-                            fontSize: 14,
                           ),
                         ),
                       ],
@@ -184,10 +131,9 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
 
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: filteredApps.length,
+                  itemCount: controller.filteredApps.length,
                   itemBuilder: (context, index) {
-                    final app = filteredApps[index];
-
+                    final app = controller.filteredApps[index];
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
@@ -197,7 +143,7 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                       ),
                       child: Row(
                         children: [
-                          // App Icon
+                          // Icon
                           Container(
                             width: 48,
                             height: 48,
@@ -212,29 +158,16 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                                       child: Image.memory(
                                         app.icon!,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (
-                                          context,
-                                          error,
-                                          stackTrace,
-                                        ) {
-                                          return Icon(
-                                            Icons.videogame_asset,
-                                            color: Colors.grey[400],
-                                            size: 24,
-                                          );
-                                        },
                                       ),
                                     )
                                     : Icon(
-                                      Icons.android,
+                                      Icons.videogame_asset,
                                       color: Colors.grey[400],
-                                      size: 24,
                                     ),
                           ),
-
                           const SizedBox(width: 16),
 
-                          // App Name
+                          // Name
                           Expanded(
                             child: Text(
                               app.name,
@@ -248,7 +181,7 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                             ),
                           ),
 
-                          // Play Button
+                          // Play
                           GestureDetector(
                             onTap: () => _playGame(app),
                             child: Container(
@@ -281,11 +214,5 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
   }
 }

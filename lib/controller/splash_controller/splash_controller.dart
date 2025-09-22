@@ -25,7 +25,7 @@ class SplashController extends GetxController
 
 
     AdHelper.precacheInterstitialAd();
-    AdHelper.precacheNativeAd();
+   
 
     // Khởi tạo animation
     progressController = AnimationController(

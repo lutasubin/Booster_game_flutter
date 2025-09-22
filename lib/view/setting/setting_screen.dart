@@ -1,3 +1,7 @@
+import 'package:booster_game/helper/anaylish_firebase/anaylish.dart';
+import 'package:booster_game/view/custom_ads/native_ads.dart';
+import 'package:booster_game/view/setting/lang/language.dart';
+import 'package:booster_game/view/setting/rate_app/rating.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -19,6 +23,7 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
+      bottomNavigationBar: NativeAdWithLoadingWidget(adType: ''),
 
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
@@ -55,7 +60,13 @@ class _MenuScreenState extends State<MenuScreen> {
               icon: Icons.language,
               iconColor: Colors.white,
               title: 'Language'.tr,
-              onTap: () {},
+              onTap: () {
+                AnalyticsHelper.logSettingChange(
+                  'open_language_settings',
+                  'clicked',
+                );
+                Get.to(() => LanguageSelectionScreen());
+              },
             ),
             const SizedBox(height: 20),
             _buildMenuItem(
@@ -63,7 +74,10 @@ class _MenuScreenState extends State<MenuScreen> {
               icon: Icons.star,
               iconColor: Colors.white,
               title: 'Rate App',
-              onTap: () {},
+              onTap: () {
+                AnalyticsHelper.logSettingChange('open_rating', 'clicked');
+                showRatingBottomSheet(context);
+              },
             ),
             const SizedBox(height: 20),
             _buildMenuItem(
@@ -72,6 +86,7 @@ class _MenuScreenState extends State<MenuScreen> {
               iconColor: Colors.white,
               title: 'Share',
               onTap: () async {
+                AnalyticsHelper.logSettingChange('share_app', 'clicked');
                 final String appLink =
                     'https://play.google.com/store/apps/details?id=com.example.booster_game';
                 final String message = 'Check out Our app: $appLink';
@@ -84,7 +99,12 @@ class _MenuScreenState extends State<MenuScreen> {
               icon: Icons.privacy_tip,
               iconColor: Colors.white,
               title: 'Privacy Policy',
-              onTap: () {},
+              onTap: () {
+                AnalyticsHelper.logSettingChange(
+                  'open_privacy_policy',
+                  'clicked',
+                );
+              },
             ),
           ],
         ),
@@ -135,4 +155,16 @@ class _MenuScreenState extends State<MenuScreen> {
       ),
     );
   }
+}
+
+void showRatingBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    backgroundColor: Colors.transparent,
+    builder: (_) => const RatingBottomSheet(),
+  );
 }

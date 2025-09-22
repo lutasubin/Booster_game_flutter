@@ -15,8 +15,7 @@ class AdHelper {
   static InterstitialAd? _interstitialAd;
   static bool _interstitialAdLoaded = false;
 
-  static NativeAd? _nativeAd;
-
+  
 
   //*****************Interstitial Ad******************
 
@@ -97,59 +96,85 @@ class AdHelper {
 
   //*****************Native Ad******************
 
-  static void precacheNativeAd() {
-    log('Precache Native Ad - Id: ${Config.nativeAd}');
-
-    if (Config.hideAds) return;
-
-    _nativeAd = NativeAd(
-      adUnitId: Config.nativeAd,
-      listener: NativeAdListener(
-        onAdLoaded: (ad) {
-          log('$NativeAd loaded.');
-        },
-        onAdFailedToLoad: (ad, error) {
-          _resetNativeAd();
-          log('$NativeAd failed to load: $error');
-        },
-      ),
-      request: const AdRequest(),
-      // Styling
-      nativeTemplateStyle: NativeTemplateStyle(
-        templateType: TemplateType.small,
-      ),
-    )..load();
-  }
-
-  static void _resetNativeAd() {
-    _nativeAd?.dispose();
-    _nativeAd = null;
-  }
-
+  /// Tải và trả về một quảng cáo tự nhiên.
+  /// [adController] dùng để theo dõi trạng thái tải quảng cáo.
+  /// Trả về null nếu quảng cáo bị ẩn hoặc tải thất bại.
   static NativeAd? loadNativeAd({required NativeAdController adController}) {
     log('Native Ad Id: ${Config.nativeAd}');
 
     if (Config.hideAds) return null;
 
-    // Luôn tạo ad mới để tránh conflict giữa các widget
+    // Luôn tạo ad mới thay vì chia sẻ static ad
     return NativeAd(
-      adUnitId: Config.nativeAd,
-      listener: NativeAdListener(
-        onAdLoaded: (ad) {
-          log('$NativeAd loaded.');
-          adController.adLoaded.value = true;
-        },
-        onAdFailedToLoad: (ad, error) {
-          log('$NativeAd failed to load: $error');
-          adController.adLoaded.value = false;
-        },
-      ),
-      request: const AdRequest(),
-      // Styling
-      nativeTemplateStyle: NativeTemplateStyle(
-        templateType: TemplateType.small,
-      ),
-    )..load();
+        adUnitId: Config.nativeAd,
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            log('$NativeAd loaded.');
+            adController.adLoaded.value = true;
+          },
+          onAdFailedToLoad: (ad, error) {
+            log('$NativeAd failed to load: $error');
+            adController.adLoaded.value = false;
+          },
+        ),
+        request: const AdRequest(),
+        factoryId: 'customNativeAd')
+      ..load();
+  }
+
+
+   //*****************Native Ad1******************
+
+  /// Tải và trả về một quảng cáo tự nhiên medium.
+  /// [adController] dùng để theo dõi trạng thái tải quảng cáo.
+  /// Trả về null nếu quảng cáo bị ẩn hoặc tải thất bại.
+  static NativeAd? loadNativeAd1({required NativeAdController adController}) {
+    log('Native Ad Medium Id: ${Config.nativeAd}');
+
+    if (Config.hideAds) return null;
+
+    // Luôn tạo ad mới thay vì chia sẻ static ad
+    return NativeAd(
+        adUnitId: Config.nativeAd,
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            log('$NativeAd Medium loaded.');
+            adController.adLoaded.value = true;
+          },
+          onAdFailedToLoad: (ad, error) {
+            log('$NativeAd Medium failed to load: $error');
+            adController.adLoaded.value = false;
+          },
+        ),
+        request: const AdRequest(),
+        factoryId: 'customNativeAdMedium') // Sử dụng medium factory
+      ..load();
+  }
+
+   //*****************Native Ad Full******************
+
+  /// Tải và trả về một quảng cáo tự nhiên full-screen height container.
+  /// Sử dụng factory riêng cho layout full.
+  static NativeAd? loadNativeAdFull({required NativeAdController adController}) {
+    log('Native Ad Full Id: ${Config.nativeAd}');
+
+    if (Config.hideAds) return null;
+
+    return NativeAd(
+        adUnitId: Config.nativeAd,
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            log('Native Ad Full loaded.');
+            adController.adLoaded.value = true;
+          },
+          onAdFailedToLoad: (ad, error) {
+            log('Native Ad Full failed to load: $error');
+            adController.adLoaded.value = false;
+          },
+        ),
+        request: const AdRequest(),
+        factoryId: 'customNativeAdFull')
+      ..load();
   }
 
   //*****************Rewarded Ad******************

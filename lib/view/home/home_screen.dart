@@ -1,6 +1,7 @@
 import 'package:booster_game/controller/home_controller/home_controller.dart';
 import 'package:booster_game/controller/native_controller/native_controller.dart';
 import 'package:booster_game/helper/gg_ads/ads_setup.dart';
+import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:booster_game/view/game_mode/game_mode.dart';
 import 'package:booster_game/view/home/circular.dart';
 import 'package:booster_game/view/mode_setting/mode_setting.dart';
@@ -8,7 +9,6 @@ import 'package:booster_game/view/setting/setting_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -83,29 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: Obx(() {
-        return _adController.ad != null && _adController.adLoaded.isTrue
-            ? SafeArea(
-              child: SizedBox(
-                height: 120,
-                child: AdWidget(
-                  key: ValueKey(_adController.ad.hashCode),
-                  ad: _adController.ad!,
-                ),
-              ),
-            )
-            : Container(
-              height: 120,
-              // ignore: deprecated_member_use
-              color: Colors.blue.withOpacity(0.1),
-              child: Center(
-                child: Text(
-                  'Ads Loading...',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
-              ),
-            );
-      }),
+
       backgroundColor: const Color(0xFF1A1A1A),
       body: SafeArea(
         child: Padding(
@@ -178,10 +156,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
+                   InkWell(
+                    onTap: (){
+                        Get.to(() => ModeSettingScreen());
+                    },
+                    child:  Row(
                       children: [
                         const Text(
-                          'Apply For All',
+                          'Mode Booster',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 15,
@@ -189,14 +171,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        InkWell(
-                          onTap: () async {
-                            Get.to(() => ModeSettingScreen());
-                          },
-                          child: SvgPicture.asset('assets/icons/setting2.svg'),
-                        ),
+                        SvgPicture.asset('assets/icons/setting2.svg'),
                       ],
                     ),
+                   ),
                     Obx(
                       () => Row(
                         children: [
@@ -226,11 +204,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
-                              AdHelper.showInterstitialAd(
-                                onComplete: () {
-                                  Get.to(() => GameModeSelectionScreen());
-                                },
-                              );
+                              // AdHelper.showInterstitialAd(
+                              //   onComplete: () {
+                              //     Get.to(() => GameModeSelectionScreen());
+                              //   },
+                              // );
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
@@ -269,6 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Center(
                 child: Column(
                   children: [
+                   NativeAdWithLoadingWidget(),
                     Text(
                       'Game Booster',
                       style: TextStyle(
@@ -278,17 +257,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    SvgPicture.asset(
-                      'assets/svg/bosster.svg',
-                      height: 120,
-                      width: 120,
+                    InkWell(
+                      onTap: () {
+                        Get.to(() => GameModeSelectionScreen());
+                      },
+                      child: SvgPicture.asset(
+                        'assets/svg/bosster.svg',
+                        height: 120,
+                        width: 120,
+                      ),
                     ),
                     SizedBox(height: 40),
                     Text(
                       'Press The Button ”🚀” To Start Speeding Up The Game',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

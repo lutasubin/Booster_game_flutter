@@ -1,4 +1,5 @@
 import 'package:booster_game/model/onboard.dart';
+import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:booster_game/view/home/home_screen.dart';
 import 'package:booster_game/controller/splash_controller/splash_controller.dart';
 import 'package:flutter/material.dart';
@@ -56,6 +57,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
+      bottomNavigationBar: NativeAdWithLoadingWidget(adType: 'medium',),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

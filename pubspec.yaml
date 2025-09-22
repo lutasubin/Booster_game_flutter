@@ -38,8 +38,9 @@ dependencies:
   # GetX
   get: ^4.7.2
 
-  # Icon svg
+  # Icon svg , lottie
   flutter_svg: ^2.2.0
+  lottie: ^3.3.1
 
   # CPU,RAM,SPEED
   system_info2: ^4.0.0
@@ -64,6 +65,10 @@ dependencies:
   firebase_core: ^4.0.0
   firebase_remote_config: ^6.0.0
   google_mobile_ads: ^6.0.0
+  firebase_analytics: ^12.0.1
+  url_launcher: ^6.3.2
+  package_info_plus: ^9.0.0
+ 
 
 dev_dependencies:
   flutter_test:

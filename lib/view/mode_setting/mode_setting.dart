@@ -1,9 +1,9 @@
 import 'package:booster_game/controller/mode_setting_controller/mode_setting_controller.dart';
 import 'package:booster_game/controller/native_controller/native_controller.dart';
 import 'package:booster_game/helper/gg_ads/ads_setup.dart';
+import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class ModeSettingScreen extends StatefulWidget {
   const ModeSettingScreen({super.key});
@@ -42,6 +42,7 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
     final controller = Get.find<ModeSettingController>();
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
+
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
@@ -66,29 +67,7 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
         ),
       ),
 
-      bottomNavigationBar: Obx(() {
-        return _adController2.ad != null && _adController2.adLoaded.isTrue
-            ? SafeArea(
-              child: SizedBox(
-                height: 120,
-                child: AdWidget(
-                  key: ValueKey(_adController2.ad.hashCode),
-                  ad: _adController2.ad!,
-                ),
-              ),
-            )
-            : Container(
-              height: 120,
-              // ignore: deprecated_member_use
-              color: Colors.blue.withOpacity(0.1),
-              child: Center(
-                child: Text(
-                  'Ads Loading...',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            );
-      }),
+      bottomNavigationBar: NativeAdWithLoadingWidget(adType: ''),
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
@@ -283,30 +262,60 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
             ),
           ),
 
+          SizedBox(height: 10),
           // FPS Options
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: Text(
-              'FPS',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A),
+              border: Border.all(
+                color: const Color(0xFFFFFFFF).withOpacity(0.05),
               ),
             ),
-          ),
-          Obx(
-            () => Wrap(
-              spacing: 10,
-              children:
-                  [60, 90, 120, 144].map((fps) {
-                    return ChoiceChip(
-                      label: Text('$fps Fps'),
-                      selected: controller.selectedFps.value == fps,
-                      onSelected: (val) {
-                        if (val) controller.selectedFps.value = fps;
-                      },
-                    );
-                  }).toList(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    'FPS',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Obx(
+                  () => Row(
+                    children:
+                        [60, 90, 120, 150].map((fps) {
+                          return Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: ChoiceChip(
+                                label: Center(child: Text('$fps ')),
+                                selected: controller.selectedFps.value == fps,
+                                onSelected: (val) {
+                                  if (val) controller.selectedFps.value = fps;
+                                },
+                                selectedColor: const Color(0xFF00FFB3),
+                                labelStyle: TextStyle(
+                                  color:
+                                      controller.selectedFps.value == fps
+                                          ? Colors.black
+                                          : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                backgroundColor: const Color(0xFF25252B),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

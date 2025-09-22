@@ -1,3 +1,4 @@
+import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:booster_game/view/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,6 +13,8 @@ class WelcomeScreen extends StatelessWidget {
     final isSmallScreen = screenSize.height < 600;
 
     return Scaffold(
+      backgroundColor: const Color(0xFF1A1A1A),
+      bottomNavigationBar: NativeAdWithLoadingWidget(adType: '',),
       body: Container(
         width: double.infinity,
         height: double.infinity,

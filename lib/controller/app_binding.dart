@@ -1,3 +1,4 @@
+import 'package:booster_game/controller/app_selections_controller/app_controller.dart';
 import 'package:booster_game/controller/home_controller/home_controller.dart';
 import 'package:booster_game/controller/mode_setting_controller/mode_setting_controller.dart';
 import 'package:booster_game/controller/splash_controller/splash_controller.dart';
@@ -14,5 +15,8 @@ class AppBinding extends Bindings {
 
     // Khởi tạo SplashController (không cần permanent)
     Get.lazyPut<SplashController>(() => SplashController());
+
+
+    Get.put<AppSelectionController>(AppSelectionController(),permanent: true);
   }
 }

@@ -1,6 +1,5 @@
 import 'package:booster_game/controller/home_controller/home_controller.dart';
-import 'package:booster_game/controller/native_controller/native_controller.dart';
-import 'package:booster_game/helper/gg_ads/ads_setup.dart';
+import 'package:booster_game/helper/dilogs/my_dilogs.dart';
 import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:booster_game/view/game_mode/game_mode.dart';
 import 'package:booster_game/view/home/circular.dart';
@@ -18,7 +17,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _adController = NativeAdController();
   bool _adInitialized = false;
 
   @override
@@ -29,15 +27,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _initializeAd() {
     if (!_adInitialized) {
-      _adController.ad = AdHelper.loadNativeAd(adController: _adController);
       _adInitialized = true;
     }
   }
 
-  @override
-  void dispose() {
-    _adController.ad?.dispose();
-    super.dispose();
+ 
+
+  // Hàm xử lý khi bấm vào mode_booster
+  void _handleModeBoosterTap(HomeController controller) {
+    if (controller.canAccessModeSettings()) {
+      // Nếu đã enable, cho phép truy cập
+      Get.to(() => ModeSettingScreen());
+    } else {
+      // Nếu chưa enable, hiển thị thông báo
+      MyDialogs.wanning();
+    }
   }
 
   @override
@@ -46,34 +50,16 @@ class _HomeScreenState extends State<HomeScreen> {
     final HomeController controller = Get.find<HomeController>();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const  Color(0xFF18181B),
-        title: // Gaming Mode Title
-            const Row(
-          children: [
-            Text(
-              'GAMING',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-              ),
-            ),
-            SizedBox(width: 8),
-            Text(
-              'MODE',
-              style: TextStyle(
-                color: Color(0xFF00FFB3),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-              ),
-            ),
-          ],
+        backgroundColor: const Color(0xFF18181B),
+        automaticallyImplyLeading: false,
+        title: SvgPicture.asset(
+          'assets/svg/gaming_mode.svg',
+          height: 18,
+          width: 149,
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: InkWell(
               onTap: () {
                 Get.to(() => MenuScreen());
@@ -84,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      backgroundColor: const  Color(0xFF18181B),
+      backgroundColor: const Color(0xFF18181B),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -95,7 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: const  Color(0xFF18181B), // màu nền gần giống hình (xám đậm)
+                  color: const Color(
+                    0xFF18181B,
+                  ), // màu nền gần giống hình (xám đậm)
 
                   border: Border.all(
                     // ignore: deprecated_member_use
@@ -116,14 +104,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Obx(
-                      () =>  GaugeCircle(
+                      () => GaugeCircle(
                         label: 'RAM',
                         percentage: controller.ramUsage.round(),
                         color: const Color(0xFFFFD700),
                       ),
                     ),
                     Obx(
-                      () =>  GaugeCircle(
+                      () => GaugeCircle(
                         label: 'SPEED',
                         percentage: controller.speedScore.round(),
                         color: const Color(0xFF00FFB3),
@@ -139,7 +127,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: const  Color(0xFF18181B), // màu nền gần giống hình (xám đậm)
+                  color: const Color(
+                    0xFF18181B,
+                  ), // màu nền gần giống hình (xám đậm)
 
                   border: Border.all(
                     // ignore: deprecated_member_use
@@ -152,30 +142,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                   InkWell(
-                    onTap: (){
-                        Get.to(() => ModeSettingScreen());
-                    },
-                    child:  Row(
-                      children: [
-                        const Text(
-                          'Mode Booster',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
+                    InkWell(
+                      onTap: () {
+                        _handleModeBoosterTap(controller);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Obx(
+                              () => Text(
+                                'mode_booster'.tr,
+                                style: TextStyle(
+                                  fontFamily: 'Play',
+                                  color:
+                                      controller.isGameModeEnabled
+                                          ? Colors.white
+                                          : Colors.grey[500],
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Obx(
+                              () => SvgPicture.asset(
+                                'assets/icons/setting2.svg',
+                                // ignore: deprecated_member_use
+                                color:
+                                    controller.isGameModeEnabled
+                                        ? Color(0xFF00FFB3)
+                                        : Colors.grey[500],
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        SvgPicture.asset('assets/icons/setting2.svg'),
-                      ],
+                      ),
                     ),
-                   ),
                     Obx(
                       () => Row(
                         children: [
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () async {
+                              await controller.toggleGameMode(false);
+                            },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -187,11 +196,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ? Colors.grey[600]
                                         : Colors.transparent,
                                 borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color:
+                                      !controller.isGameModeEnabled
+                                          ? Colors.grey[600]!
+                                          : Colors.grey[600]!,
+                                  width: 1,
+                                ),
                               ),
-                              child: const Text(
-                                'Disable',
+                              child: Text(
+                                'disable'.tr,
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  fontFamily: 'Play',
+                                  color:
+                                      !controller.isGameModeEnabled
+                                          ? Colors.white
+                                          : Colors.grey[400],
                                   fontSize: 14,
                                 ),
                               ),
@@ -199,12 +219,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(width: 8),
                           GestureDetector(
-                            onTap: () {
-                              // AdHelper.showInterstitialAd(
-                              //   onComplete: () {
-                              //     Get.to(() => GameModeSelectionScreen());
-                              //   },
-                              // );
+                            onTap: () async {
+                              await controller.toggleGameMode(true);
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
@@ -217,16 +233,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ? const Color(0xFF00FFB3)
                                         : Colors.transparent,
                                 borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color:
+                                      controller.isGameModeEnabled
+                                          ? const Color(0xFF00FFB3)
+                                          : Colors.grey[600]!,
+                                  width: 1,
+                                ),
                               ),
                               child: Text(
-                                'Enable',
+                                'enable'.tr,
                                 style: TextStyle(
                                   color:
                                       controller.isGameModeEnabled
                                           ? Colors.black
-                                          : Colors.white,
+                                          : Colors.grey[400],
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Play',
                                 ),
                               ),
                             ),
@@ -243,10 +266,11 @@ class _HomeScreenState extends State<HomeScreen> {
               Center(
                 child: Column(
                   children: [
-                   NativeAdWithLoadingWidget(),
+                    NativeAdWithLoadingWidget(),
                     Text(
                       'Game Booster',
                       style: TextStyle(
+                        fontFamily: 'Play',
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 25,
@@ -265,8 +289,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 40),
                     Text(
-                      'Press The Button ”🚀” To Start Speeding Up The Game',
+                      'click_button'.tr,
                       style: TextStyle(
+                        fontFamily: 'Play',
                         color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -281,44 +306,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // Widget _buildPerformanceCircle({
-  //   required String label,
-  //   required int percentage,
-  //   required Color color,
-  // }) {
-  //   return Column(
-  //     children: [
-  //       SizedBox(
-  //         width: 80,
-  //         height: 80,
-  //         child: CustomPaint(
-  //           painter: CircularProgressPainter(
-  //             progress: percentage / 100,
-  //             color: color,
-  //           ),
-  //           child: Center(
-  //             child: Text(
-  //               '$percentage%',
-  //               style: const TextStyle(
-  //                 color: Colors.white,
-  //                 fontSize: 14,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //       const SizedBox(height: 8),
-  //       Text(
-  //         label,
-  //         style: TextStyle(
-  //           color: Colors.grey[400],
-  //           fontSize: 12,
-  //           fontWeight: FontWeight.w500,
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 }

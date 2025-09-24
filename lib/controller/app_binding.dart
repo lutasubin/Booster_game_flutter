@@ -16,7 +16,7 @@ class AppBinding extends Bindings {
     // Khởi tạo SplashController (không cần permanent)
     Get.lazyPut<SplashController>(() => SplashController());
 
-
+    // Khoi tao App lay app 
     Get.put<AppSelectionController>(AppSelectionController(),permanent: true);
   }
 }

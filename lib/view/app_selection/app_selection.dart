@@ -53,8 +53,9 @@ class AppSelectionScreen extends StatelessWidget {
         ),
         title: Obx(
           () => Text(
-            controller.searchQuery.isEmpty ? 'SELECT GAME' : 'ALL APPS',
+            controller.searchQuery.isEmpty ? 'select'.tr : 'all'.tr,
             style: const TextStyle(
+              fontFamily: 'Play',
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -84,8 +85,8 @@ class AppSelectionScreen extends StatelessWidget {
                       controller: searchController,
                       onChanged: controller.filterApps,
                       style: const TextStyle(color: Colors.white, fontSize: 16),
-                      decoration: const InputDecoration(
-                        hintText: 'Search App',
+                      decoration:  InputDecoration(
+                        hintText: 'search'.tr,
                         hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
                         border: InputBorder.none,
                         isDense: true,
@@ -193,9 +194,10 @@ class AppSelectionScreen extends StatelessWidget {
                                 color: const Color(0xFF00FFB3),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text(
-                                'Play',
+                              child:  Text(
+                                'play'.tr,
                                 style: TextStyle(
+                                  fontFamily: 'Play',
                                   color: Colors.black,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,

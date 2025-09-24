@@ -13,8 +13,8 @@ class WelcomeScreen extends StatelessWidget {
     final isSmallScreen = screenSize.height < 600;
 
     return Scaffold(
-      backgroundColor: const  Color(0xFF18181B),
-      bottomNavigationBar: NativeAdWithLoadingWidget(adType: '',),
+      backgroundColor: const Color(0xFF18181B),
+      bottomNavigationBar: NativeAdWithLoadingWidget(adType: ''),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -32,7 +32,6 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 // Logo
                 SvgPicture.asset('assets/svg/Gaming Mode.svg'),
 
@@ -43,6 +42,7 @@ class WelcomeScreen extends StatelessWidget {
                   'Wishing you great performance and lots of fun.\nEnjoy your game!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
+                    fontFamily: 'Play',
                     fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.w500,
                     color: Colors.white.withAlpha(204), // 0.8 opacity
@@ -60,7 +60,7 @@ class WelcomeScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       Get.off(
-                        () =>  HomeScreen(),
+                        () => HomeScreen(),
                         transition: Transition.fade,
                         duration: const Duration(milliseconds: 500),
                       );
@@ -77,8 +77,9 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'PLAY NOW',
+                      'play_now'.tr,
                       style: TextStyle(
+                        fontFamily: 'Play',
                         fontSize: isSmallScreen ? 16 : 18,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.5,
@@ -93,6 +94,7 @@ class WelcomeScreen extends StatelessWidget {
                 Text(
                   'This action may contain ads',
                   style: TextStyle(
+                    fontFamily: 'Play',
                     fontSize: isSmallScreen ? 10 : 12,
                     color: Colors.white.withAlpha(153), // 0.6 opacity
                     fontWeight: FontWeight.w400,

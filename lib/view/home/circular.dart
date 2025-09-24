@@ -27,6 +27,7 @@ class GaugeCircle extends StatelessWidget {
               child: Text(
                 "$percentage%",
                 style: const TextStyle(
+                  fontFamily: 'Play',
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -39,9 +40,10 @@ class GaugeCircle extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
+            fontFamily: 'Play',
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],

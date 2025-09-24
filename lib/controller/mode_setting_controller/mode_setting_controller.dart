@@ -1,3 +1,5 @@
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:screen_brightness/screen_brightness.dart';
@@ -6,26 +8,26 @@ import 'package:permission_handler/permission_handler.dart';
 
 class ModeSettingController extends GetxController {
   // Brightness
-  RxBool brightnessEnabled = true.obs;
+  RxBool brightnessEnabled = false.obs;
   RxDouble brightnessLevel = 75.0.obs;
-  
+
   // Audio
-  RxBool ringtoneEnabled = true.obs;
+  RxBool ringtoneEnabled = false.obs;
   RxDouble ringtoneVolume = 75.0.obs;
-  
-  RxBool mediaEnabled = true.obs;
+
+  RxBool mediaEnabled = false.obs;
   RxDouble mediaVolume = 75.0.obs;
-  
+
   // Call
   RxBool autoRejectCall = false.obs;
   RxBool notificationBlock = false.obs;
-  
+
   // FPS Options
   RxInt selectedFps = 60.obs;
-  
+
   // Store original values for restore
   double _originalBrightness = 0.75;
-  
+
   @override
   void onInit() {
     super.onInit();
@@ -33,7 +35,7 @@ class ModeSettingController extends GetxController {
     _loadCurrentSettings();
     _listenToVolumeChanges();
   }
-  
+
   // Request permissions with better error handling
   Future<void> _requestPermissions() async {
     try {
@@ -41,13 +43,13 @@ class ModeSettingController extends GetxController {
       await Permission.systemAlertWindow.request();
       await Permission.phone.request();
       await Permission.notification.request();
-      
+
       print("Permissions requested successfully");
     } catch (e) {
       print('Error requesting permissions: $e');
     }
   }
-  
+
   // Load current device settings with better error handling
   Future<void> _loadCurrentSettings() async {
     try {
@@ -55,16 +57,17 @@ class ModeSettingController extends GetxController {
       double currentBrightness = await ScreenBrightness().current;
       _originalBrightness = currentBrightness;
       brightnessLevel.value = currentBrightness * 100;
-      
+
       // Get current volume - use await for better handling
       double? currentVolume = await FlutterVolumeController.getVolume();
       if (currentVolume != null) {
         mediaVolume.value = currentVolume * 100;
         ringtoneVolume.value = currentVolume * 100;
       }
-      
-      print("Current settings loaded: brightness=${brightnessLevel.value}%, volume=${mediaVolume.value}%");
-      
+
+      print(
+        "Current settings loaded: brightness=${brightnessLevel.value}%, volume=${mediaVolume.value}%",
+      );
     } catch (e) {
       print('Error loading current settings: $e');
       // Set default values if loading fails
@@ -73,7 +76,7 @@ class ModeSettingController extends GetxController {
       ringtoneVolume.value = 75.0;
     }
   }
-  
+
   // Listen to volume changes from hardware buttons
   void _listenToVolumeChanges() {
     try {
@@ -90,7 +93,7 @@ class ModeSettingController extends GetxController {
       print('Error setting up volume listener: $e');
     }
   }
-  
+
   // Update brightness on device
   Future<void> updateBrightness(double value) async {
     try {
@@ -112,7 +115,7 @@ class ModeSettingController extends GetxController {
       );
     }
   }
-  
+
   // Update media volume on device
   Future<void> updateMediaVolume(double value) async {
     try {
@@ -133,7 +136,7 @@ class ModeSettingController extends GetxController {
       );
     }
   }
-  
+
   // Update ringtone volume on device
   Future<void> updateRingtoneVolume(double value) async {
     try {
@@ -154,7 +157,7 @@ class ModeSettingController extends GetxController {
       );
     }
   }
-  
+
   // Toggle brightness enabled/disabled
   void toggleBrightness(bool enabled) {
     brightnessEnabled.value = enabled;
@@ -166,7 +169,7 @@ class ModeSettingController extends GetxController {
       print("Brightness enabled");
     }
   }
-  
+
   // Toggle ringtone enabled/disabled
   void toggleRingtone(bool enabled) {
     ringtoneEnabled.value = enabled;
@@ -180,8 +183,8 @@ class ModeSettingController extends GetxController {
       print("Ringtone enabled");
     }
   }
-  
-  // Toggle media enabled/disabled  
+
+  // Toggle media enabled/disabled
   void toggleMedia(bool enabled) {
     mediaEnabled.value = enabled;
     if (!enabled) {
@@ -194,7 +197,7 @@ class ModeSettingController extends GetxController {
       print("Media enabled");
     }
   }
-  
+
   // Save function with better feedback
   Future<void> saveSettings() async {
     try {
@@ -202,7 +205,7 @@ class ModeSettingController extends GetxController {
       await updateBrightness(brightnessLevel.value);
       await updateMediaVolume(mediaVolume.value);
       await updateRingtoneVolume(ringtoneVolume.value);
-      
+
       print("Settings saved and applied to device!");
       Get.snackbar(
         'Success',
@@ -223,7 +226,31 @@ class ModeSettingController extends GetxController {
       );
     }
   }
-  
+
+   // Mở danh sách tất cả app trong cài đặt Notifications
+  void openAllAppsNotificationSettings() {
+    final intent = AndroidIntent(
+      action: 'android.settings.NOTIFICATION_SETTINGS',
+      flags: [Flag.FLAG_ACTIVITY_NEW_TASK],
+    );
+    intent.launch();
+  }
+
+  // Bật/tắt Auto Reject Call
+  void toggleAutoRejectCall(bool value) {
+    autoRejectCall.value = value;
+    if (value) {
+      openAllAppsNotificationSettings();
+    }
+  }
+   // Bật/tắt Notification
+  void toggleNotification(bool value) {
+    notificationBlock.value = value;
+    if (value) {
+      openAllAppsNotificationSettings();
+    }
+  }
+
   @override
   void onClose() {
     try {

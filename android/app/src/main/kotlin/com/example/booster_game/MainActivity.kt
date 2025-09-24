@@ -22,9 +22,18 @@ class MainActivity : FlutterActivity() {
     
     // MethodChannel cho system cleaner
     private val SYSTEM_CLEANER_CHANNEL = "system_cleaner"
+    
+    // MethodChannel cho CPU monitoring
+    private val CPU_MONITOR_CHANNEL = "cpu_monitor"
+    
+    // CpuManager instance
+    private lateinit var cpuManager: CpuManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Khởi tạo CpuManager
+        cpuManager = CpuManager(this)
 
         // Khởi động UMP trước khi init quảng cáo
         requestUserConsent()
@@ -82,7 +91,7 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    // --- Đăng ký Custom Native Ads + System Cleaner ---
+    // --- Đăng ký Custom Native Ads + System Cleaner + CPU Monitor ---
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
@@ -162,6 +171,56 @@ class MainActivity : FlutterActivity() {
                     }
                 }
             }
+
+        // 🧠 CPU MONITOR CHANNEL  
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CPU_MONITOR_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "getCpuUsage" -> {
+                        try {
+                            val cpuUsage = cpuManager.getCpuUsage()
+                            result.success(cpuUsage)
+                        } catch (e: Exception) {
+                            result.error("CPU_ERROR", "Failed to get CPU usage: ${e.message}", null)
+                        }
+                    }
+                    "getAppCpuUsage" -> {
+                        try {
+                            val appCpuUsage = cpuManager.getAppCpuUsage()
+                            result.success(appCpuUsage)
+                        } catch (e: Exception) {
+                            result.error("APP_CPU_ERROR", "Failed to get app CPU usage: ${e.message}", null)
+                        }
+                    }
+                    "getCpuInfo" -> {
+                        try {
+                            val cpuInfo = cpuManager.getCpuInfo()
+                            result.success(cpuInfo)
+                        } catch (e: Exception) {
+                            result.error("CPU_INFO_ERROR", "Failed to get CPU info: ${e.message}", null)
+                        }
+                    }
+                    "testCpuMethods" -> {
+                        try {
+                            val testResults = cpuManager.testAllMethods()
+                            result.success(testResults)
+                        } catch (e: Exception) {
+                            result.error("CPU_TEST_ERROR", "Failed to test CPU methods: ${e.message}", null)
+                        }
+                    }
+                    "resetCpuManager" -> {
+                        try {
+                            cpuManager.reset()
+                            result.success("CPU Manager reset successfully")
+                        } catch (e: Exception) {
+                            result.error("CPU_RESET_ERROR", "Failed to reset CPU manager: ${e.message}", null)
+                        }
+                    }
+                    else -> {
+                        result.notImplemented()
+                    }
+                }
+            }
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
@@ -171,39 +230,25 @@ class MainActivity : FlutterActivity() {
         GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "customNativeAdFull")
     }
 
-    // 🧹 SYSTEM CLEANER FUNCTIONS
+    // 🧹 EXISTING SYSTEM CLEANER FUNCTIONS (giữ nguyên)
     
-    /**
-     * Force garbage collection
-     */
     private fun forceGarbageCollection() {
-        // Gọi GC multiple times để đảm bảo hiệu quả
         System.gc()
         Runtime.getRuntime().gc()
-        
-        // Sleep một chút để GC có thời gian chạy
         Thread.sleep(100)
-        
-        // Gọi lại lần nữa
         System.gc()
-        
         println("🗑️ Garbage Collection completed")
     }
     
-    /**
-     * Clear system cache (requires system permissions - may not work on all devices)
-     */
     private fun clearSystemCache(): Long {
         var clearedSize = 0L
         
         try {
-            // Clear app's internal cache
             val cacheDir = cacheDir
             if (cacheDir != null && cacheDir.exists()) {
                 clearedSize = deleteFolderRecursively(cacheDir)
             }
             
-            // Clear external cache if available
             val externalCacheDir = externalCacheDir
             if (externalCacheDir != null && externalCacheDir.exists()) {
                 clearedSize += deleteFolderRecursively(externalCacheDir)
@@ -215,21 +260,18 @@ class MainActivity : FlutterActivity() {
             println("❌ Error clearing system cache: ${e.message}")
         }
         
-        return clearedSize / (1024 * 1024) // Convert to MB
+        return clearedSize / (1024 * 1024)
     }
     
-    /**
-     * Get memory information
-     */
     private fun getMemoryInfo(): Map<String, Any> {
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val memoryInfo = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(memoryInfo)
         
-        val totalRAM = memoryInfo.totalMem / (1024 * 1024) // MB
-        val availableRAM = memoryInfo.availMem / (1024 * 1024) // MB
+        val totalRAM = memoryInfo.totalMem / (1024 * 1024)
+        val availableRAM = memoryInfo.availMem / (1024 * 1024)
         val usedRAM = totalRAM - availableRAM
-        val memoryThreshold = memoryInfo.threshold / (1024 * 1024) // MB
+        val memoryThreshold = memoryInfo.threshold / (1024 * 1024)
         
         return mapOf(
             "totalRAM" to totalRAM,
@@ -240,9 +282,6 @@ class MainActivity : FlutterActivity() {
         )
     }
     
-    /**
-     * Get storage information
-     */
     private fun getStorageInfo(): Map<String, Any> {
         val stat = StatFs(Environment.getDataDirectory().path)
         val bytesAvailable = stat.blockSizeLong * stat.availableBlocksLong
@@ -250,37 +289,29 @@ class MainActivity : FlutterActivity() {
         val bytesUsed = bytesTotal - bytesAvailable
         
         return mapOf(
-            "totalStorage" to bytesTotal / (1024 * 1024), // MB
-            "availableStorage" to bytesAvailable / (1024 * 1024), // MB
-            "usedStorage" to bytesUsed / (1024 * 1024) // MB
+            "totalStorage" to bytesTotal / (1024 * 1024),
+            "availableStorage" to bytesAvailable / (1024 * 1024),
+            "usedStorage" to bytesUsed / (1024 * 1024)
         )
     }
     
-    /**
-     * Kill background apps (limited effectiveness on modern Android)
-     */
     private fun killBackgroundApps(): Int {
         var killedCount = 0
         
         try {
             val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            
-            // Get running app processes
             val runningApps = activityManager.runningAppProcesses
             val packageManager = packageManager
             
             runningApps?.forEach { processInfo ->
                 try {
-                    // Chỉ kill các process không phải system và không phải app hiện tại
                     if (processInfo.processName != packageName && 
                         processInfo.importance > ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
-                        
-                        // Thử kill process (có thể không work trên Android mới)
                         android.os.Process.killProcess(processInfo.pid)
                         killedCount++
                     }
                 } catch (e: Exception) {
-                    // Ignore - không có quyền kill process này
+                    // Ignore
                 }
             }
             
@@ -293,26 +324,20 @@ class MainActivity : FlutterActivity() {
         return killedCount
     }
     
-    /**
-     * Clear app's cache directories
-     */
     private fun clearAppCache(): Long {
         var clearedSize = 0L
         
         try {
-            // Clear internal cache
             val cacheDir = cacheDir
             if (cacheDir?.exists() == true) {
                 clearedSize += deleteFolderRecursively(cacheDir)
             }
             
-            // Clear external cache
             val externalCacheDir = externalCacheDir  
             if (externalCacheDir?.exists() == true) {
                 clearedSize += deleteFolderRecursively(externalCacheDir)
             }
             
-            // Clear code cache (Android 5.0+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 val codeCacheDir = codeCacheDir
                 if (codeCacheDir?.exists() == true) {
@@ -324,12 +349,9 @@ class MainActivity : FlutterActivity() {
             println("❌ Error clearing app cache: ${e.message}")
         }
         
-        return clearedSize / (1024 * 1024) // Convert to MB
+        return clearedSize / (1024 * 1024)
     }
     
-    /**
-     * Helper function to delete folder recursively and return size
-     */
     private fun deleteFolderRecursively(folder: File): Long {
         var deletedSize = 0L
         
@@ -345,7 +367,7 @@ class MainActivity : FlutterActivity() {
                         }
                     }
                 }
-                folder.delete() // Delete the folder itself
+                folder.delete()
             }
         } catch (e: Exception) {
             println("❌ Error deleting folder ${folder.path}: ${e.message}")

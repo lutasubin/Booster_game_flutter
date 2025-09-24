@@ -39,9 +39,10 @@ class _MenuScreenState extends State<MenuScreen> {
           onPressed: () => Get.back(),
         ),
 
-        title: const Text(
-          'SETTING',
+        title:  Text(
+          'setting'.tr,
           style: TextStyle(
+            fontFamily: 'Play',
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -59,13 +60,13 @@ class _MenuScreenState extends State<MenuScreen> {
               context: context,
               icon: Icons.language,
               iconColor: Colors.white,
-              title: 'Language'.tr,
+              title: 'language'.tr,
               onTap: () {
                 AnalyticsHelper.logSettingChange(
                   'open_language_settings',
                   'clicked',
                 );
-                Get.to(() => LanguageSelectionScreen());
+                Get.off(() => LanguageSelectionScreen());
               },
             ),
             const SizedBox(height: 20),
@@ -73,7 +74,7 @@ class _MenuScreenState extends State<MenuScreen> {
               context: context,
               icon: Icons.star,
               iconColor: Colors.white,
-              title: 'Rate App',
+              title: 'rate_app'.tr,
               onTap: () {
                 AnalyticsHelper.logSettingChange('open_rating', 'clicked');
                 showRatingBottomSheet(context);
@@ -84,7 +85,7 @@ class _MenuScreenState extends State<MenuScreen> {
               context: context,
               icon: Icons.share,
               iconColor: Colors.white,
-              title: 'Share',
+              title: 'share'.tr,
               onTap: () async {
                 AnalyticsHelper.logSettingChange('share_app', 'clicked');
                 final String appLink =
@@ -98,7 +99,7 @@ class _MenuScreenState extends State<MenuScreen> {
               context: context,
               icon: Icons.privacy_tip,
               iconColor: Colors.white,
-              title: 'Privacy Policy',
+              title: 'privacy'.tr,
               onTap: () {
                 AnalyticsHelper.logSettingChange(
                   'open_privacy_policy',
@@ -136,8 +137,8 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Text(
                 title,
                 style: const TextStyle(
+                  fontFamily: 'Play',
                   fontSize: 18,
-                  fontWeight: FontWeight.w500,
                   color: Color(0xFFFFFFFF),
                 ),
               ),

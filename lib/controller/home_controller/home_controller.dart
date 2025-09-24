@@ -1,12 +1,12 @@
+import 'package:booster_game/helper/dilogs/my_dilogs.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:system_info2/system_info2.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:installed_apps/installed_apps.dart';
-import 'package:installed_apps/app_info.dart';
+import 'package:flutter/services.dart';
 
 class HomeController extends GetxController {
   // System Info - Observable
@@ -14,40 +14,35 @@ class HomeController extends GetxController {
   final _ramUsage = 0.0.obs;
   final _speedScore = 0.0.obs;
 
-  // Gaming Mode - Observable
-  final _isApplyForAllEnabled = true.obs;
+  // Gaming Mode - Observable (mặc định là false - disabled)
   final _isGameModeEnabled = false.obs;
 
-  // Apps - Observable
-  final _installedApps = <AppInfo>[].obs;
-  final _gameApps = <AppInfo>[].obs;
-  final _isLoadingApps = false.obs;
-
   Timer? _systemInfoTimer;
+  SharedPreferences? _prefs;
+
+  // Key để lưu trạng thái
+  static const String _gameModeKey = 'game_mode_enabled';
+
+  // Method channel cho CPU monitoring
+  static const MethodChannel _cpuChannel = MethodChannel('cpu_monitor');
 
   // Getters
   double get cpuUsage => _cpuUsage.value;
   double get ramUsage => _ramUsage.value;
   double get speedScore => _speedScore.value;
-  bool get isApplyForAllEnabled => _isApplyForAllEnabled.value;
   bool get isGameModeEnabled => _isGameModeEnabled.value;
-  List<AppInfo> get installedApps => _installedApps;
-  List<AppInfo> get gameApps => _gameApps;
-  bool get isLoadingApps => _isLoadingApps.value;
 
   // Reactive getters
   RxDouble get cpuUsageRx => _cpuUsage;
   RxDouble get ramUsageRx => _ramUsage;
   RxDouble get speedScoreRx => _speedScore;
   RxBool get isGameModeEnabledRx => _isGameModeEnabled;
-  RxList<AppInfo> get gameAppsRx => _gameApps;
-  RxBool get isLoadingAppsRx => _isLoadingApps;
 
   @override
   void onInit() {
     super.onInit();
+    _initPreferences();
     _startSystemMonitoring();
-    _loadInstalledApps();
   }
 
   @override
@@ -56,19 +51,81 @@ class HomeController extends GetxController {
     super.onClose();
   }
 
-  // Gaming Mode Actions
-  void toggleGameMode(bool enabled) {
-    _isGameModeEnabled.value = enabled;
-    if (enabled && !_isLoadingApps.value && _gameApps.isEmpty) {
-      _loadInstalledApps();
+  /// Khởi tạo SharedPreferences và load trạng thái đã lưu
+  Future<void> _initPreferences() async {
+    try {
+      _prefs = await SharedPreferences.getInstance();
+      await _loadGameModeState();
+    } catch (e) {
+      print('Error initializing preferences: $e');
     }
   }
 
-  void toggleApplyForAll() {
-    _isApplyForAllEnabled.value = !_isApplyForAllEnabled.value;
+  /// Load trạng thái Game Mode từ SharedPreferences
+  Future<void> _loadGameModeState() async {
+    try {
+      final savedState = _prefs?.getBool(_gameModeKey) ?? false;
+      _isGameModeEnabled.value = savedState;
+      print('Loaded game mode state: $savedState');
+    } catch (e) {
+      print('Error loading game mode state: $e');
+      _isGameModeEnabled.value = false;
+    }
   }
 
-  // System Monitoring
+  /// Lưu trạng thái Game Mode vào SharedPreferences
+  Future<void> _saveGameModeState(bool isEnabled) async {
+    try {
+      await _prefs?.setBool(_gameModeKey, isEnabled);
+      print('Saved game mode state: $isEnabled');
+    } catch (e) {
+      print('Error saving game mode state: $e');
+    }
+  }
+
+  /// Phương thức để toggle game mode với lưu trữ
+  Future<void> toggleGameMode(bool isEnabled) async {
+    _isGameModeEnabled.value = isEnabled;
+
+    // Lưu trạng thái vào SharedPreferences
+    await _saveGameModeState(isEnabled);
+
+    if (isEnabled) {
+      // Hiển thị thông báo khi bật
+      MyDialogs.enable();
+    } else {
+      // Hiển thị thông báo khi tắt
+      MyDialogs.disable();
+    }
+  }
+
+  /// Phương thức để reset trạng thái (nếu cần)
+  Future<void> resetGameModeState() async {
+    try {
+      await _prefs?.remove(_gameModeKey);
+      _isGameModeEnabled.value = false;
+      print('Reset game mode state');
+    } catch (e) {
+      print('Error resetting game mode state: $e');
+    }
+  }
+
+  /// Phương thức kiểm tra có thể truy cập Mode Setting không
+  bool canAccessModeSettings() {
+    return _isGameModeEnabled.value;
+  }
+
+  /// Lấy trạng thái hiện tại từ storage (để debug)
+  Future<bool?> getStoredGameModeState() async {
+    try {
+      return _prefs?.getBool(_gameModeKey);
+    } catch (e) {
+      print('Error getting stored game mode state: $e');
+      return null;
+    }
+  }
+
+  // ============== SYSTEM MONITORING ==============
   void _startSystemMonitoring() {
     _getSystemInfo();
     _systemInfoTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
@@ -78,8 +135,10 @@ class HomeController extends GetxController {
 
   Future<void> _getSystemInfo() async {
     try {
-      if (Platform.isAndroid || Platform.isIOS) {
-        await _getMobileSystemInfo();
+      if (Platform.isAndroid) {
+        await _getAndroidSystemInfo();
+      } else if (Platform.isIOS) {
+        await _getIOSSystemInfo();
       } else {
         await _getDesktopSystemInfo();
       }
@@ -89,45 +148,50 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> _getMobileSystemInfo() async {
+  /// Android system info với CpuManager
+  Future<void> _getAndroidSystemInfo() async {
     try {
       final deviceInfo = DeviceInfoPlugin();
+      final androidInfo = await deviceInfo.androidInfo;
 
-      if (Platform.isAndroid) {
-        final androidInfo = await deviceInfo.androidInfo;
+      // CPU thật từ CpuManager
+      _cpuUsage.value = await getAndroidCpuUsage();
 
-        _cpuUsage.value = _calculateCpuUsage();
+      // RAM thật
+      final ramPercent = await getAndroidRamUsage();
+      _ramUsage.value = ramPercent;
 
-        final totalMemory = SysInfo.getTotalPhysicalMemory();
-        final freeMemory = SysInfo.getFreePhysicalMemory();
-        _ramUsage.value = ((totalMemory - freeMemory) / totalMemory * 100)
-            .clamp(0, 100);
-
-        _speedScore.value = _calculateSpeedScore(androidInfo.hardware);
-      } else if (Platform.isIOS) {
-        final iosInfo = await deviceInfo.iosInfo;
-
-        _cpuUsage.value = _calculateCpuUsage();
-        _ramUsage.value = _estimateIOSRamUsage();
-        _speedScore.value = _calculateIOSSpeedScore(iosInfo.model);
-      }
+      // Speed score giả lập dựa vào hardware
+      _speedScore.value = _calculateSpeedScore(androidInfo.hardware);
     } catch (e) {
-      print('Mobile system info error: $e');
+      print('Android system info error: $e');
       _setFallbackSystemValues();
     }
   }
 
+  /// iOS system info (giả lập)
+  Future<void> _getIOSSystemInfo() async {
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      final iosInfo = await deviceInfo.iosInfo;
+
+      _cpuUsage.value = math.Random().nextDouble() * 100; // iOS cần native code
+      _ramUsage.value = _estimateIOSRamUsage();
+      _speedScore.value = _calculateIOSSpeedScore(iosInfo.model);
+    } catch (e) {
+      print('iOS system info error: $e');
+      _setFallbackSystemValues();
+    }
+  }
+
+  /// Desktop system info
   Future<void> _getDesktopSystemInfo() async {
     try {
       final cores = SysInfo.cores.length;
-      _cpuUsage.value = _calculateCpuUsage();
 
       final totalMemory = SysInfo.getTotalPhysicalMemory();
       final freeMemory = SysInfo.getFreePhysicalMemory();
-      _ramUsage.value = ((totalMemory - freeMemory) / totalMemory * 100).clamp(
-        0,
-        100,
-      );
+      _ramUsage.value = ((totalMemory - freeMemory) / totalMemory * 100).clamp(0, 100);
 
       _speedScore.value = _calculateDesktopSpeedScore(cores);
     } catch (e) {
@@ -136,10 +200,145 @@ class HomeController extends GetxController {
     }
   }
 
-  double _calculateCpuUsage() {
-    final random = math.Random();
-    return (30 + random.nextDouble() * 40).clamp(0, 100);
+  // ============== CPU USAGE THẬT VỚI CPUMANAGER ==============
+
+  /// CPU usage thật từ CpuManager (Android)
+  Future<double> getAndroidCpuUsage() async {
+    try {
+      // Gọi CpuManager qua MethodChannel
+      final double cpuUsage = await _cpuChannel.invokeMethod('getCpuUsage');
+      return cpuUsage.clamp(0, 100);
+    } catch (e) {
+      print("Error getting CPU from CpuManager: $e");
+      // Fallback về load average method
+      return await _getCpuFallback();
+    }
   }
+
+  /// App CPU usage (optional)
+  Future<double> getAppCpuUsage() async {
+    try {
+      final double appCpuUsage = await _cpuChannel.invokeMethod('getAppCpuUsage');
+      return appCpuUsage.clamp(0, 50);
+    } catch (e) {
+      print("Error getting app CPU: $e");
+      return 15.0; // Default app CPU
+    }
+  }
+
+  /// Lấy thông tin chi tiết CPU
+  Future<Map<String, dynamic>> getCpuInfo() async {
+    try {
+      final Map<dynamic, dynamic> cpuInfo = await _cpuChannel.invokeMethod('getCpuInfo');
+      return Map<String, dynamic>.from(cpuInfo);
+    } catch (e) {
+      print("Error getting CPU info: $e");
+      return {
+        'systemCpuUsage': await getAndroidCpuUsage(),
+        'appCpuUsage': 15.0,
+        'numCores': 4,
+        'error': e.toString(),
+      };
+    }
+  }
+
+  /// Test tất cả các CPU methods
+  Future<Map<String, double>> testCpuMethods() async {
+    try {
+      print("🧪 Testing all CPU measurement methods...");
+      final Map<dynamic, dynamic> results = await _cpuChannel.invokeMethod('testCpuMethods');
+      final Map<String, double> testResults = Map<String, double>.from(
+        results.map((key, value) => MapEntry(key.toString(), value?.toDouble() ?? 0.0))
+      );
+      
+      print("📊 CPU Test Results:");
+      testResults.forEach((method, value) {
+        print("   $method: ${value.toStringAsFixed(1)}%");
+      });
+      
+      return testResults;
+    } catch (e) {
+      print("❌ Error testing CPU methods: $e");
+      return {
+        'error': 0.0,
+        'fallback': await _getCpuFallback(),
+      };
+    }
+  }
+
+  /// Reset CpuManager
+  Future<void> resetCpuManager() async {
+    try {
+      await _cpuChannel.invokeMethod('resetCpuManager');
+      print("✅ CPU Manager reset successfully");
+    } catch (e) {
+      print("❌ Error resetting CPU manager: $e");
+    }
+  }
+
+  /// Fallback CPU method
+  Future<double> _getCpuFallback() async {
+    try {
+      // Sử dụng performance-based estimation
+      final stopwatch = Stopwatch()..start();
+      
+      for (int i = 0; i < 50000; i++) {
+      }
+      
+      stopwatch.stop();
+      final executionTime = stopwatch.elapsedMilliseconds;
+      
+      // Baseline: ~30-80ms cho mobile devices
+      final baselineTime = 50.0;
+      final performanceRatio = executionTime / baselineTime;
+      
+      final estimatedCpu = 30.0 + (performanceRatio - 1.0) * 25.0 + 
+                          (math.Random().nextDouble() * 10.0 - 5.0);
+      
+      return estimatedCpu.clamp(20, 80);
+      
+    } catch (e) {
+      print("Error in CPU fallback: $e");
+      final random = math.Random();
+      return (35 + random.nextInt(25)).toDouble(); // 35% - 60%
+    }
+  }
+
+  // ============== RAM USAGE (giữ nguyên) ==============
+
+  /// RAM usage (Android)
+  Future<double> getAndroidRamUsage() async {
+    try {
+      final memInfo = await File('/proc/meminfo').readAsLines();
+      int total = 0;
+      int free = 0;
+
+      for (var line in memInfo) {
+        if (line.startsWith('MemTotal:')) {
+          total = int.parse(line.split(RegExp(r'\s+'))[1]);
+        } else if (line.startsWith('MemAvailable:')) {
+          free = int.parse(line.split(RegExp(r'\s+'))[1]);
+        }
+      }
+
+      if (total > 0 && free > 0) {
+        double usedPercent = ((total - free) / total) * 100;
+        return usedPercent.clamp(0, 100);
+      }
+      return 0.0;
+    } catch (e) {
+      print("Error reading RAM usage: $e");
+      return _getFallbackRamUsage();
+    }
+  }
+
+  /// Fallback RAM usage
+  double _getFallbackRamUsage() {
+    final random = math.Random();
+    return (45 + random.nextInt(25)).toDouble(); // 45% - 70%
+  }
+
+  // ============== HELPER FUNCTIONS (giữ nguyên) ==============
 
   double _estimateIOSRamUsage() {
     final random = math.Random();
@@ -176,165 +375,33 @@ class HomeController extends GetxController {
     _speedScore.value = 55.0;
   }
 
-  // Apps Management
-  Future<void> _loadInstalledApps() async {
-    if (!Platform.isAndroid) return;
+  // ============== DEBUG METHODS ==============
 
-    _isLoadingApps.value = true;
-
+  /// Method để debug và test CPU measurement
+  Future<void> debugCpuMeasurement() async {
+    print("🔍 ==> CPU Debug Information <==");
+    
     try {
-      final apps = await InstalledApps.getInstalledApps(true, true);
-
-      // Nếu gameApps trống, tự động filter games
-      if (_gameApps.isEmpty) {
-        final games = apps.where((app) {
-          final name = app.name.toLowerCase();
-          final packageName = app.packageName.toLowerCase();
-
-          final gameKeywords = [
-            'game',
-            'play',
-            'war',
-            'battle',
-            'fight',
-            'racing',
-            'puzzle',
-            'craft',
-            'clash',
-            'legends',
-            'mobile',
-            'hero',
-            'adventure',
-            'arena',
-            'fire',
-            'pubg',
-            'cod',
-            'valorant',
-            'minecraft',
-            'roblox',
-            'fortnite',
-            'among',
-            'candy',
-            'angry',
-            'temple',
-            'subway',
-            'pokemon',
-            'fifa',
-            'nba',
-            'gta',
-            'assassin',
-            'call of duty',
-            'free fire',
-            'genshin',
-            'honkai',
-            'tower',
-          ];
-
-          return gameKeywords.any(
-            (keyword) =>
-                name.contains(keyword) || packageName.contains(keyword),
-          );
-        }).toList();
-
-        if (games.isEmpty) {
-          _gameApps.value = _getDemoGames();
-        } else {
-          _gameApps.value = games;
-        }
-      }
-
-      _installedApps.value = apps;
+      // Test individual methods
+      // Get detailed CPU info
+      final cpuInfo = await getCpuInfo();
+      print("📱 Device Info:");
+      cpuInfo.forEach((key, value) {
+        print("   $key: $value");
+      });
+      
+      // Current readings
+      final currentCpu = await getAndroidCpuUsage();
+      final currentAppCpu = await getAppCpuUsage();
+      
+      print("📊 Current Readings:");
+      print("   System CPU: ${currentCpu.toStringAsFixed(1)}%");
+      print("   App CPU: ${currentAppCpu.toStringAsFixed(1)}%");
+      
     } catch (e) {
-      print('Error loading apps: $e');
-      if (_installedApps.isEmpty) {
-        _installedApps.value = _getDemoApps();
-      }
-      if (_gameApps.isEmpty) {
-        _gameApps.value = _getDemoGames();
-      }
-    } finally {
-      _isLoadingApps.value = false;
+      print("❌ Debug error: $e");
     }
-  }
-
-  List<AppInfo> _getDemoGames() {
-    return [
-      _createDemoApp('Arena Of Valor', 'com.ngame.allstar.eu'),
-      _createDemoApp('Free Fire', 'com.dts.freefireth'),
-      _createDemoApp('Genshin Impact', 'com.miHoYo.GenshinImpact'),
-    ];
-  }
-
-  List<AppInfo> _getDemoApps() {
-    return [
-      _createDemoApp('Arena Of Valor', 'com.ngame.allstar.eu'),
-      _createDemoApp('Free Fire', 'com.dts.freefireth'),
-      _createDemoApp('Genshin', 'com.miHoYo.GenshinImpact'),
-      _createDemoApp('Roblox', 'com.roblox.client'),
-      _createDemoApp('Cap Cut', 'com.lemon.lvoverseas'),
-      _createDemoApp('Facebook', 'com.facebook.katana'),
-      _createDemoApp('Tiktok', 'com.zhiliaoapp.musically'),
-      _createDemoApp('Instagram', 'com.instagram.android'),
-      _createDemoApp('YouTube', 'com.google.android.youtube'),
-      _createDemoApp('WhatsApp', 'com.whatsapp'),
-    ];
-  }
-
-  AppInfo _createDemoApp(String name, String packageName) {
-    return AppInfo(
-      name: name,
-      packageName: packageName,
-      versionName: '1.0.0',
-      versionCode: 1,
-      icon: null,
-      builtWith: BuiltWith.flutter,
-      installedTimestamp: DateTime.now().millisecondsSinceEpoch,
-    );
-  }
-
-  // Method để cập nhật game apps từ AppSelectionScreen
-  void updateGameApps(List<AppInfo> selectedApps) {
-    _gameApps.clear();
-    _gameApps.addAll(selectedApps);
-    update(); // Trigger UI update
-  }
-
-  // Method để thêm app vào game list
-  void addGameApp(AppInfo app) {
-    if (!_gameApps.any((gameApp) => gameApp.packageName == app.packageName)) {
-      _gameApps.add(app);
-    }
-  }
-
-  // Method để xóa app khỏi game list
-  void removeGameApp(String packageName) {
-    _gameApps.removeWhere((app) => app.packageName == packageName);
-  }
-
-  Future<void> bootGame(AppInfo app) async {
-    try {
-      await InstalledApps.startApp(app.packageName);
-
-      Get.snackbar(
-        'Success',
-        'Starting ${app.name}...',
-        backgroundColor: const Color(0xFF00FFB3),
-        colorText: Colors.black,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      print('Error starting app: $e');
-      Get.snackbar(
-        'Error',
-        'Cannot start ${app.name}',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-  }
-
-  void refreshApps() {
-    _loadInstalledApps();
+    
+    print("🔍 ==> End CPU Debug <==\n");
   }
 }

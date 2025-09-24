@@ -66,17 +66,28 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(content["emoji"]!, style: const TextStyle(fontSize: 48)),
+            Text(
+              content["emoji"]!,
+              style: const TextStyle(fontFamily: 'Play', fontSize: 48),
+            ),
             const SizedBox(height: 12),
             Text(
               content["title"]!,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontFamily: 'Play',
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               content["message"]!,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: Colors.black54),
+              style: const TextStyle(
+                fontFamily: 'Play',
+                fontSize: 14,
+                color: Colors.black54,
+              ),
             ),
             const SizedBox(height: 20),
             Row(

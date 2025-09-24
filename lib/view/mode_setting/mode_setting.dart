@@ -54,11 +54,18 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
               Icon(Icons.arrow_back_ios, color: Color(0xFF00FFB3), size: 16),
             ],
           ),
-          onPressed: () => Get.back(),
+          onPressed: () {
+            AdHelper.showInterstitialAd(
+              onComplete: () {
+                Get.back();
+              },
+            );
+          },
         ),
-        title: const Text(
-          'MODE SETTING',
+        title: Text(
+          'mode_setting'.tr,
           style: TextStyle(
+            fontFamily: 'Play',
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -89,8 +96,8 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
                     inactiveTrackColor: const Color(0xFF25252B),
                     activeTrackColor: Color(0xFF00FFB3),
                     title: Text(
-                      'Brightness (Current Device)',
-                      style: TextStyle(color: Colors.white),
+                      'bright'.tr,
+                      style: TextStyle(fontFamily: 'Play', color: Colors.white),
                     ),
                     value: controller.brightnessEnabled.value,
                     onChanged: (val) => controller.toggleBrightness(val),
@@ -121,7 +128,7 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color:    const  Color(0xFF18181B),
+              color: const Color(0xFF18181B),
               border: Border.all(
                 color: const Color(0xFFFFFFFF).withOpacity(0.05),
               ),
@@ -135,8 +142,8 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
                     inactiveTrackColor: const Color(0xFF25252B),
                     activeTrackColor: Color(0xFF00FFB3),
                     title: Text(
-                      'Ringtone (System Volume)',
-                      style: TextStyle(color: Colors.white),
+                      'ringtone'.tr,
+                      style: TextStyle(fontFamily: 'Play', color: Colors.white),
                     ),
                     value: controller.ringtoneEnabled.value,
                     onChanged: (val) => controller.toggleRingtone(val),
@@ -167,7 +174,7 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color:  const  Color(0xFF18181B),
+              color: const Color(0xFF18181B),
               border: Border.all(
                 // ignore: deprecated_member_use
                 color: const Color(0xFFFFFFFF).withOpacity(0.05),
@@ -182,8 +189,8 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
                     inactiveTrackColor: const Color(0xFF25252B),
                     activeTrackColor: Color(0xFF00FFB3),
                     title: Text(
-                      'Media (System Volume)',
-                      style: TextStyle(color: Colors.white),
+                      'media'.tr,
+                      style: TextStyle(fontFamily: 'Play', color: Colors.white),
                     ),
                     value: controller.mediaEnabled.value,
                     onChanged: (val) => controller.toggleMedia(val),
@@ -214,7 +221,7 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color:  const  Color(0xFF18181B),
+              color: const Color(0xFF18181B),
               border: Border.all(
                 color: const Color(0xFFFFFFFF).withOpacity(0.05),
               ),
@@ -226,11 +233,11 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
                 inactiveTrackColor: const Color(0xFF25252B),
                 activeTrackColor: Color(0xFF00FFB3),
                 title: Text(
-                  'Auto Reject Call',
-                  style: TextStyle(color: Colors.white),
+                  'call'.tr,
+                  style: TextStyle(fontFamily: 'Play', color: Colors.white),
                 ),
                 value: controller.autoRejectCall.value,
-                onChanged: (val) => controller.autoRejectCall.value = val,
+                onChanged: (val) => controller.toggleAutoRejectCall(val),
               ),
             ),
           ),
@@ -240,7 +247,7 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color:  const  Color(0xFF18181B),
+              color: const Color(0xFF18181B),
               border: Border.all(
                 // ignore: deprecated_member_use
                 color: const Color(0xFFFFFFFF).withOpacity(0.05),
@@ -253,72 +260,122 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
                 inactiveTrackColor: const Color(0xFF25252B),
                 activeTrackColor: Color(0xFF00FFB3),
                 title: Text(
-                  'Notification Block',
-                  style: TextStyle(color: Colors.white),
+                  'notification'.tr,
+                  style: TextStyle(fontFamily: 'Play', color: Colors.white),
                 ),
                 value: controller.notificationBlock.value,
-                onChanged: (val) => controller.notificationBlock.value = val,
+                onChanged: (val) => controller.toggleNotification(val),
               ),
             ),
           ),
 
           SizedBox(height: 10),
+
           // FPS Options
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             decoration: BoxDecoration(
-              color:  const  Color(0xFF18181B),
+              color: const Color(0xFF18181B),
               border: Border.all(
+                // ignore: deprecated_member_use
                 color: const Color(0xFFFFFFFF).withOpacity(0.05),
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 8.0),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 16.0),
                   child: Text(
                     'FPS',
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Play',
+                      fontSize: 16,
                       color: Colors.white,
                     ),
                   ),
                 ),
                 Obx(
-                  () => Row(
-                    children:
-                        [60, 90, 120, 150].map((fps) {
-                          return Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              child: ChoiceChip(
-                                label: Center(child: Text('$fps ')),
-                                selected: controller.selectedFps.value == fps,
-                                onSelected: (val) {
-                                  if (val) controller.selectedFps.value = fps;
-                                },
-                                selectedColor: const Color(0xFF00FFB3),
-                                labelStyle: TextStyle(
-                                  color:
-                                      controller.selectedFps.value == fps
-                                          ? Colors.black
-                                          : Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                backgroundColor: const Color(0xFF25252B),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                  () => Column(
+                    children: [
+                      // First row: 60 FPS and 90 FPS
+                      Row(
+                        children: [
+                          Expanded(child: _buildFpsOption(60, controller)),
+                          SizedBox(width: 12),
+                          Expanded(child: _buildFpsOption(90, controller)),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      // Second row: 120 FPS and 144 FPS
+                      Row(
+                        children: [
+                          Expanded(child: _buildFpsOption(120, controller)),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: _buildFpsOption(
+                              144,
+                              controller,
+                            ), // Changed from 150 to 144
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Add this helper method in your _ModeSettingScreenState class:
+  Widget _buildFpsOption(int fps, ModeSettingController controller) {
+    final isSelected = controller.selectedFps.value == fps;
+
+    return GestureDetector(
+      onTap: () {
+        controller.selectedFps.value = fps;
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF25252B),
+
+          border: Border.all(
+            color: isSelected ? const Color(0xFF00FFB3) : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                color:
+                    isSelected ? const Color(0xFF00FFB3) : Colors.transparent,
+                border: Border.all(color: const Color(0xFF00FFB3), width: 2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+              child:
+                  isSelected
+                      ? Icon(Icons.check, size: 12, color: Colors.black)
+                      : null,
+            ),
+            SizedBox(width: 8),
+            Text(
+              '$fps Fps',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'Play',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

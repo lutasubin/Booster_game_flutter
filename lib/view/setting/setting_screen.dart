@@ -23,92 +23,123 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF18181B),
-      bottomNavigationBar: NativeAdWithLoadingWidget(adType: ''),
-
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF18181B),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.arrow_back_ios, color: Color(0xFF00FFB3), size: 16),
-              Icon(Icons.arrow_back_ios, color: Color(0xFF00FFB3), size: 16),
-            ],
+      bottomNavigationBar: SafeArea(
+        child: NativeAdWithLoadingWidget(adType: ''),
+      ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/main.png'),
+              fit: BoxFit.cover,
+            ),
           ),
-          onPressed: () => Get.back(),
-        ),
-
-        title:  Text(
-          'setting'.tr,
-          style: TextStyle(
-            fontFamily: 'Play',
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.arrow_back_ios,
+                    color: Color(0xFF00FFB3),
+                    size: 16,
+                  ),
+                  Icon(
+                    Icons.arrow_back_ios,
+                    color: Color(0xFF00FFB3),
+                    size: 16,
+                  ),
+                ],
+              ),
+              onPressed: () => Get.back(),
+            ),
+            title: Text(
+              'setting'.tr,
+              style: TextStyle(
+                fontFamily: 'Play',
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
           ),
         ),
       ),
+      body: Stack(
+        children: [
+          // Background Image
+          Positioned.fill(
+            child: Image.asset('assets/images/main.png', fit: BoxFit.cover),
+          ),
 
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-        child: Column(
-          children: [
-            // Các mục menu cũ
-            _buildMenuItem(
-              context: context,
-              icon: Icons.language,
-              iconColor: Colors.white,
-              title: 'language'.tr,
-              onTap: () {
-                AnalyticsHelper.logSettingChange(
-                  'open_language_settings',
-                  'clicked',
-                );
-                Get.off(() => LanguageSelectionScreen());
-              },
+          // Content
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 20.0,
             ),
-            const SizedBox(height: 20),
-            _buildMenuItem(
-              context: context,
-              icon: Icons.star,
-              iconColor: Colors.white,
-              title: 'rate_app'.tr,
-              onTap: () {
-                AnalyticsHelper.logSettingChange('open_rating', 'clicked');
-                showRatingBottomSheet(context);
-              },
+            child: Column(
+              children: [
+                // Các mục menu cũ
+                _buildMenuItem(
+                  context: context,
+                  icon: Icons.language,
+                  iconColor: Colors.white,
+                  title: 'language'.tr,
+                  onTap: () {
+                    AnalyticsHelper.logSettingChange(
+                      'open_language_settings',
+                      'clicked',
+                    );
+                    Get.off(() => LanguageSelectionScreen());
+                  },
+                ),
+                const SizedBox(height: 20),
+                _buildMenuItem(
+                  context: context,
+                  icon: Icons.star,
+                  iconColor: Colors.white,
+                  title: 'rate_app'.tr,
+                  onTap: () {
+                    AnalyticsHelper.logSettingChange('open_rating', 'clicked');
+                    showRatingBottomSheet(context);
+                  },
+                ),
+                const SizedBox(height: 20),
+                _buildMenuItem(
+                  context: context,
+                  icon: Icons.share,
+                  iconColor: Colors.white,
+                  title: 'share'.tr,
+                  onTap: () async {
+                    AnalyticsHelper.logSettingChange('share_app', 'clicked');
+                    final String appLink =
+                        'https://play.google.com/store/apps/details?id=com.example.booster_game';
+                    final String message = 'Check out Our app: $appLink';
+                    await Share.share(message, subject: 'Share App');
+                  },
+                ),
+                const SizedBox(height: 20),
+                _buildMenuItem(
+                  context: context,
+                  icon: Icons.privacy_tip,
+                  iconColor: Colors.white,
+                  title: 'privacy'.tr,
+                  onTap: () {
+                    AnalyticsHelper.logSettingChange(
+                      'open_privacy_policy',
+                      'clicked',
+                    );
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            _buildMenuItem(
-              context: context,
-              icon: Icons.share,
-              iconColor: Colors.white,
-              title: 'share'.tr,
-              onTap: () async {
-                AnalyticsHelper.logSettingChange('share_app', 'clicked');
-                final String appLink =
-                    'https://play.google.com/store/apps/details?id=com.example.booster_game';
-                final String message = 'Check out Our app: $appLink';
-                await Share.share(message, subject: 'Share App');
-              },
-            ),
-            const SizedBox(height: 20),
-            _buildMenuItem(
-              context: context,
-              icon: Icons.privacy_tip,
-              iconColor: Colors.white,
-              title: 'privacy'.tr,
-              onTap: () {
-                AnalyticsHelper.logSettingChange(
-                  'open_privacy_policy',
-                  'clicked',
-                );
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -126,8 +157,10 @@ class _MenuScreenState extends State<MenuScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         decoration: BoxDecoration(
-          color: const Color(0xFF25252B),
-          border: Border.all(color: Colors.black12),
+          border: Border.all(
+            // ignore: deprecated_member_use
+            color: const Color(0xFFFFFFFF).withOpacity(0.05),
+          ),
         ),
         child: Row(
           children: [

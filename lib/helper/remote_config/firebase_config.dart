@@ -6,9 +6,12 @@ class Config {
   static final _config = FirebaseRemoteConfig.instance;
 
   static const _defaultValues = {
-    "interstitial_ad": "ca-app-pub-3940256099942544/1033173712",
-    "native_ad": "ca-app-pub-3940256099942544/2247696110",
-    "rewarded_ad": "ca-app-pub-3940256099942544/5224354917",
+    "interstitial_ad": "",
+    "native_ad": "",
+    "rewarded_ad": "",
+    "open_ad": "",
+    "banner_ad":"",
+    "native_medium"
     "show_ads": true
   };
 
@@ -33,6 +36,8 @@ class Config {
   static String get nativeAd => _config.getString('native_ad');
   static String get interstitialAd => _config.getString('interstitial_ad');
   static String get rewardedAd => _config.getString('rewarded_ad');
-
+  static String get openAd => _config.getString('open_ad');
+  static String get bannerAd => _config.getString('banner_ad');
+  static String get nativeAdMedium => _config.getString('native_medium');
   static bool get hideAds => !_showAd;
 }

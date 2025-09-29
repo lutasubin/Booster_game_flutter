@@ -8,11 +8,11 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      final controller = Get.find<SplashController>();
+    final controller = Get.find<SplashController>();
     return Scaffold(
       body: Container(
         // ignore: deprecated_member_use
-        color: Colors.black.withOpacity(0.9),
+        color: const Color(0xFF172032),
         child: Stack(
           children: [
             Positioned.fill(
@@ -66,8 +66,8 @@ class SplashScreen extends StatelessWidget {
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(0xFF00FFB3)
-                                        // ignore: deprecated_member_use
-                                        .withOpacity(0.4),
+                                    // ignore: deprecated_member_use
+                                    .withOpacity(0.4),
                                     blurRadius: 8,
                                     spreadRadius: 1,
                                   ),
@@ -76,8 +76,9 @@ class SplashScreen extends StatelessWidget {
                               child: Stack(
                                 children: [
                                   Container(
-                                      // ignore: deprecated_member_use
-                                      color: Colors.black.withOpacity(0.2)),
+                                    // ignore: deprecated_member_use
+                                    color: Colors.black.withOpacity(0.2),
+                                  ),
                                   FractionallySizedBox(
                                     alignment: Alignment.centerLeft,
                                     widthFactor: progress,
@@ -94,8 +95,8 @@ class SplashScreen extends StatelessWidget {
                                         boxShadow: [
                                           BoxShadow(
                                             color: const Color(0xFF00FFB3)
-                                                // ignore: deprecated_member_use
-                                                .withOpacity(glow * 0.8),
+                                            // ignore: deprecated_member_use
+                                            .withOpacity(glow * 0.8),
                                             blurRadius: 10,
                                             spreadRadius: 2,
                                           ),
@@ -118,7 +119,8 @@ class SplashScreen extends StatelessWidget {
                                             ],
                                             stops: const [0.0, 0.5, 1.0],
                                             transform: GradientRotation(
-                                              controller.progressController
+                                              controller
+                                                      .progressController
                                                       .value *
                                                   6.28,
                                             ),

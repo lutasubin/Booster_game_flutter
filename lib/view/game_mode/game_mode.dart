@@ -1,5 +1,7 @@
 import 'package:booster_game/controller/mode_game/mode_controller.dart';
+import 'package:booster_game/helper/gg_ads/ads_setup.dart';
 import 'package:booster_game/model/features.dart';
+import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -14,145 +16,184 @@ class GameModeSelectionScreen extends StatelessWidget {
     final controller = Get.put(GameModeController());
 
     return Scaffold(
+      bottomNavigationBar: SafeArea(
+        child: NativeAdWithLoadingWidget(adType: 'medium'),
+      ),
       backgroundColor: const Color(0xFF18181B),
-      body: Center(
-        child: Obx(() {
-          return controller.isBoostingComplete.value
-              ? _buildModeCard(
-                  title: 'ready'.tr,
-                  image: Image.asset('assets/images/success.png',
+      body: Stack(
+        children: [
+          // Background Image
+          Positioned.fill(
+            child: Image.asset('assets/images/main.png', fit: BoxFit.cover),
+          ),
+
+          // Content
+          Center(
+            child: Obx(() {
+              return controller.isBoostingComplete.value
+                  ? _buildModeCard(
+                    title: 'ready'.tr,
+                    image: Image.asset(
+                      'assets/images/success.png',
                       height: 92,
                       width: 166,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.check_circle, color: Color(0xFF00FFB3), size: 92)),
-                  features: controller.features,
-                  completedFeatures: controller.completedFeatures.value,
-                  borderColor: const Color(0xFF00FFB3),
-                  showPlayButton: true,
-                )
-              : _buildModeCard(
-                  title: 'accelerating'.tr,
-                  image: Lottie.asset('assets/icons/AI Robot.json',
+                      errorBuilder:
+                          (_, __, ___) => const Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF00FFB3),
+                            size: 92,
+                          ),
+                    ),
+                    features: controller.features,
+                    completedFeatures: controller.completedFeatures.value,
+                    borderColor: const Color(0xFF00FFB3),
+                    showPlayButton: true,
+                    controller: controller,
+                  )
+                  : _buildModeCard(
+                    title: 'accelerating'.tr,
+                    image: Lottie.asset(
+                      'assets/icons/AI Robot.json',
                       height: 100,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.cleaning_services, color: Color(0xFF00BFFF), size: 100)),
-                  features: controller.features,
-                  completedFeatures: controller.completedFeatures.value,
-                  borderColor: const Color(0xFF00BFFF),
-                );
-        }),
+                      errorBuilder:
+                          (_, __, ___) => const Icon(
+                            Icons.cleaning_services,
+                            color: Color(0xFF00BFFF),
+                            size: 100,
+                          ),
+                    ),
+                    features: controller.features,
+                    completedFeatures: controller.completedFeatures.value,
+                    borderColor: const Color(0xFF00BFFF),
+                    controller: controller,
+                  );
+            }),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildModeCard({
-  required String title,
-  required Widget image,
-  required List<FeatureItem> features, // đổi từ String sang FeatureItem
-  required int completedFeatures,
-  required Color borderColor,
-  bool showPlayButton = false,
-}) {
-  return Container(
-    width: double.infinity,
-    height: double.infinity,
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      color: const Color(0xFF18181B),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const SizedBox(height: 40),
-        image,
-        const SizedBox(height: 10),
-        Text(
-          title,
-          style: const TextStyle(
-            fontFamily: 'Play',
-            color: Colors.white,
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
+    required String title,
+    required Widget image,
+    required List<FeatureItem> features,
+    required int completedFeatures,
+    required Color borderColor,
+    bool showPlayButton = false,
+    required GameModeController controller,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 20),
+          image,
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: const TextStyle(
+              fontFamily: 'Play',
+              color: Colors.white,
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        const SizedBox(height: 40),
+          const SizedBox(height: 40),
 
-        ...features.asMap().entries.map((entry) {
-          int index = entry.key;
-          FeatureItem feature = entry.value;
-          Widget icon;
+          // Enhanced feature list sử dụng tất cả data từ controller
+          ...features.asMap().entries.map((entry) {
+            int index = entry.key;
+            FeatureItem feature = entry.value;
+            Widget icon;
 
-          if (index < completedFeatures) {
-            icon = SvgPicture.asset(
-              'assets/icons/icon_chon.svg',
-              width: 20,
-              height: 20,
-              errorBuilder: (_, __, ___) => const Icon(
-                Icons.check_circle,
-                color: Color(0xFF00FFB3),
-                size: 20,
+            if (index < completedFeatures) {
+              icon = SvgPicture.asset(
+                'assets/icons/icon_chon.svg',
+                width: 20,
+                height: 20,
+                errorBuilder:
+                    (_, __, ___) => const Icon(
+                      Icons.check_circle,
+                      color: Color(0xFF00FFB3),
+                      size: 20,
+                    ),
+              );
+            } else if (index == completedFeatures && !showPlayButton) {
+              icon = const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(Color(0xFF00FFB3)),
+                ),
+              );
+            } else {
+              icon = const SizedBox(width: 20, height: 20);
+            }
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  icon,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [Text(feature.text, style: feature.style)],
+                    ),
+                  ),
+                ],
               ),
             );
-          } else if (index == completedFeatures && !showPlayButton) {
-            icon = const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation(Color(0xFF00FFB3)),
-              ),
-            );
-          } else {
-            icon = const SizedBox(width: 20, height: 20);
-          }
+          }),
 
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                icon,
-                const SizedBox(width: 12),
-                Expanded(
+          const Spacer(),
+
+          // Enhanced button với đầy đủ chức năng
+          if (showPlayButton) ...[
+            SafeArea(
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    AdHelper.showInterstitialAd(
+                      onComplete: () {
+                        Get.off(() => AppSelectionScreen());
+                      },
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00FFB3),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ),
+                  ),
                   child: Text(
-                    feature.text,
-                    style: feature.style, // dùng style riêng
+                    'play_game'.tr,
+                    style: const TextStyle(
+                      fontFamily: 'Play',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
-              ],
-            ),
-          );
-        }),
-
-        const Spacer(),
-        if (showPlayButton)
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Get.off(() =>  AppSelectionScreen()),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00FFB3),
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-              child: Text(
-                'play_game'.tr,
-                style: const TextStyle(
-                  fontFamily: 'Play',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
               ),
             ),
-          ),
-        const SizedBox(height: 20),
-      ],
-    ),
-  );
-}
-
+          ],
+        ],
+      ),
+    );
+  }
 }

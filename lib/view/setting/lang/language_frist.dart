@@ -1,18 +1,18 @@
-import 'package:booster_game/helper/gg_ads/ads_setup.dart';
 import 'package:booster_game/view/custom_ads/native_ads.dart';
+import 'package:booster_game/view/welcome_game/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-class LanguageSelectionScreen extends StatefulWidget {
-  const LanguageSelectionScreen({super.key});
+class LanguageSelectionScreen1 extends StatefulWidget {
+  const LanguageSelectionScreen1({super.key});
 
   @override
-  State<LanguageSelectionScreen> createState() =>
-      _LanguageSelectionScreenState();
+  State<LanguageSelectionScreen1> createState() =>
+      _LanguageSelectionScreenState1();
 }
 
-class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
+class _LanguageSelectionScreenState1 extends State<LanguageSelectionScreen1> {
   final GetStorage storage = GetStorage();
   String selectedLanguage = "English";
 
@@ -111,11 +111,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             actions: [
               IconButton(
                 onPressed: () {
-                  AdHelper.showInterstitialAd(
-                    onComplete: () {
-                      Get.back();
-                    },
-                  );
+                  Get.offAll(WelcomeScreen());
                 },
                 icon: Icon(Icons.check, size: 24, color: Colors.white),
               ),

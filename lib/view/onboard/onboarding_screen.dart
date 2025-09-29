@@ -1,7 +1,7 @@
 import 'package:booster_game/model/onboard.dart';
 import 'package:booster_game/view/custom_ads/native_ads.dart';
-import 'package:booster_game/view/home/home_screen.dart';
 import 'package:booster_game/controller/splash_controller/splash_controller.dart';
+import 'package:booster_game/view/setting/lang/language_frist.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -151,7 +151,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       // Đánh dấu đã hoàn thành onboarding
                       await SplashController.markOnboardingCompleted();
                       // Chuyển đến home screen
-                      Get.offAll(() => HomeScreen());
+                      Get.offAll(() => LanguageSelectionScreen1());
                     } else {
                       _pageController.nextPage(
                         duration: const Duration(milliseconds: 300),

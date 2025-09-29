@@ -1,6 +1,5 @@
 package com.example.booster_game
 
-
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
@@ -31,11 +30,45 @@ class CustomNativeAdFactory(private val context: Context) : GoogleMobileAdsPlugi
                 cornerRadius = dpToPx(8).toFloat()
                 setStroke(dpToPx(1), Color.argb(13, 255, 255, 255))
             }
-            setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8))
+            setPadding(dpToPx(12), dpToPx(12), dpToPx(12), dpToPx(12))
         }
 
-        // Header container
-        val headerContainer = LinearLayout(context).apply {
+        // Play button container (moved to top)
+        val buttonContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, 0, dpToPx(12))
+            }
+        }
+
+        // Play button (larger and more prominent)
+        val playButton = Button(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 
+                dpToPx(36)
+            ).apply {
+                setMargins(dpToPx(8), 0, dpToPx(8), 0)
+            }
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#00FF88"))  // Bright green like in image
+                cornerRadius = dpToPx(8).toFloat()
+            }
+            setTextColor(Color.parseColor("#000000"))  // Black text for contrast
+            textSize = 14f
+            setTypeface(null, Typeface.BOLD)
+            text = "PLAY"
+            isAllCaps = true
+            setPadding(0, 0, 0, 0)
+        }
+
+        buttonContainer.addView(playButton)
+
+        // Content container (icon and description)
+        val contentContainer = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -45,7 +78,7 @@ class CustomNativeAdFactory(private val context: Context) : GoogleMobileAdsPlugi
 
         // Icon view
         val iconView = ImageView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(dpToPx(40), dpToPx(40))
+            layoutParams = LinearLayout.LayoutParams(dpToPx(48), dpToPx(48))
             background = GradientDrawable().apply {
                 setColor(Color.parseColor("#E0E0E0"))
                 cornerRadius = dpToPx(8).toFloat()
@@ -57,21 +90,8 @@ class CustomNativeAdFactory(private val context: Context) : GoogleMobileAdsPlugi
         val textContainer = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
-                marginStart = dpToPx(8)
+                marginStart = dpToPx(12)
             }
-        }
-
-        // Title
-        val titleView = TextView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            setTextColor(Color.WHITE)
-            textSize = 14f
-            setTypeface(null, Typeface.BOLD)
-            isSingleLine = true
-            text = "Title ads"
         }
 
         // Description container
@@ -80,9 +100,7 @@ class CustomNativeAdFactory(private val context: Context) : GoogleMobileAdsPlugi
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(0, dpToPx(2), 0, 0)
-            }
+            )
         }
 
         // AD badge
@@ -117,46 +135,32 @@ class CustomNativeAdFactory(private val context: Context) : GoogleMobileAdsPlugi
         descContainer.addView(adBadge)
         descContainer.addView(descView)
 
-        // Add to textContainer
-        textContainer.addView(titleView)
-        textContainer.addView(descContainer)
-
-        // Add to headerContainer
-        headerContainer.addView(iconView)
-        headerContainer.addView(textContainer)
-
-        // Button container
-        val buttonContainer = LinearLayout(context).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
+        // Title (moved to bottom of text container)
+        val titleView = TextView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
                 setMargins(0, dpToPx(6), 0, 0)
             }
-        }
-
-        // Install button
-        val installButton = Button(context).apply {
-            layoutParams = LinearLayout.LayoutParams(dpToPx(120), LinearLayout.LayoutParams.WRAP_CONTENT)
-            background = GradientDrawable().apply {
-                setColor(Color.parseColor("#4CAF50"))
-                cornerRadius = dpToPx(6).toFloat()
-            }
             setTextColor(Color.WHITE)
-            textSize = 12f
+            textSize = 16f  // Made larger
             setTypeface(null, Typeface.BOLD)
-            text = "INSTALL"
-            isAllCaps = true
-            setPadding(0, dpToPx(8), 0, dpToPx(8))
+            isSingleLine = true
+            text = "Game Title"
         }
 
-        buttonContainer.addView(installButton)
+        // Add to textContainer (description first, then title)
+        textContainer.addView(descContainer)
+        textContainer.addView(titleView)
 
-        // Add everything to main container
-        mainContainer.addView(headerContainer)
+        // Add to contentContainer
+        contentContainer.addView(iconView)
+        contentContainer.addView(textContainer)
+
+        // Add everything to main container (button first, then content)
         mainContainer.addView(buttonContainer)
+        mainContainer.addView(contentContainer)
 
         // Add main container to adView
         adView.addView(mainContainer)
@@ -165,13 +169,13 @@ class CustomNativeAdFactory(private val context: Context) : GoogleMobileAdsPlugi
         nativeAd.icon?.let { iconView.setImageDrawable(it.drawable) }
         nativeAd.headline?.let { titleView.text = it }
         nativeAd.body?.let { descView.text = it }
-        nativeAd.callToAction?.let { installButton.text = it.uppercase() }
+        nativeAd.callToAction?.let { playButton.text = it.uppercase() }
 
         // Register views
         adView.setIconView(iconView)
         adView.setHeadlineView(titleView)
         adView.setBodyView(descView)
-        adView.setCallToActionView(installButton)
+        adView.setCallToActionView(playButton)
 
         adView.setNativeAd(nativeAd)
 

@@ -14,7 +14,9 @@ class WelcomeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFF18181B),
-      bottomNavigationBar: NativeAdWithLoadingWidget(adType: ''),
+      bottomNavigationBar: SafeArea(
+        child: NativeAdWithLoadingWidget(adType: ''),
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,

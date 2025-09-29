@@ -1,13 +1,6 @@
 package com.example.booster_game
 
 import android.os.Bundle
-import android.content.Context
-import android.app.ActivityManager
-import android.content.pm.PackageManager
-import android.os.Build
-import android.os.StatFs
-import android.os.Environment
-import java.io.File
 import com.google.android.ump.*
 import com.google.android.gms.ads.MobileAds
 import io.flutter.embedding.android.FlutterActivity
@@ -20,20 +13,20 @@ class MainActivity : FlutterActivity() {
     private lateinit var consentInformation: ConsentInformation
     private var consentForm: ConsentForm? = null
     
-    // MethodChannel cho system cleaner
+    // MethodChannel constants
     private val SYSTEM_CLEANER_CHANNEL = "system_cleaner"
-    
-    // MethodChannel cho CPU monitoring
     private val CPU_MONITOR_CHANNEL = "cpu_monitor"
     
-    // CpuManager instance
+    // Manager instances
     private lateinit var cpuManager: CpuManager
+    private lateinit var systemCleaner: SystemCleaner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Khởi tạo CpuManager
+        // Khởi tạo managers
         cpuManager = CpuManager(this)
+        systemCleaner = SystemCleaner(this)
 
         // Khởi động UMP trước khi init quảng cáo
         requestUserConsent()
@@ -114,13 +107,14 @@ class MainActivity : FlutterActivity() {
             CustomNativeAdFullFactory(this)
         )
 
-        // 🚀 SYSTEM CLEANER CHANNEL
+        // 🚀 ENHANCED SYSTEM CLEANER CHANNEL
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SYSTEM_CLEANER_CHANNEL)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
+                    // Legacy methods (for backward compatibility)
                     "forceGC" -> {
                         try {
-                            forceGarbageCollection()
+                            systemCleaner.forceGarbageCollection()
                             result.success("GC completed successfully")
                         } catch (e: Exception) {
                             result.error("GC_ERROR", "Failed to run GC: ${e.message}", null)
@@ -128,7 +122,7 @@ class MainActivity : FlutterActivity() {
                     }
                     "clearSystemCache" -> {
                         try {
-                            val clearedSize = clearSystemCache()
+                            val clearedSize = systemCleaner.clearSystemCache()
                             result.success("Cleared $clearedSize MB of system cache")
                         } catch (e: Exception) {
                             result.error("CACHE_ERROR", "Failed to clear cache: ${e.message}", null)
@@ -136,7 +130,7 @@ class MainActivity : FlutterActivity() {
                     }
                     "getMemoryInfo" -> {
                         try {
-                            val memoryInfo = getMemoryInfo()
+                            val memoryInfo = systemCleaner.getMemoryInfo()
                             result.success(memoryInfo)
                         } catch (e: Exception) {
                             result.error("MEMORY_ERROR", "Failed to get memory info: ${e.message}", null)
@@ -144,7 +138,7 @@ class MainActivity : FlutterActivity() {
                     }
                     "getStorageInfo" -> {
                         try {
-                            val storageInfo = getStorageInfo()
+                            val storageInfo = systemCleaner.getStorageInfo()
                             result.success(storageInfo)
                         } catch (e: Exception) {
                             result.error("STORAGE_ERROR", "Failed to get storage info: ${e.message}", null)
@@ -152,7 +146,7 @@ class MainActivity : FlutterActivity() {
                     }
                     "killBackgroundApps" -> {
                         try {
-                            val killedApps = killBackgroundApps()
+                            val killedApps = systemCleaner.killBackgroundApps()
                             result.success("Killed $killedApps background processes")
                         } catch (e: Exception) {
                             result.error("KILL_ERROR", "Failed to kill background apps: ${e.message}", null)
@@ -160,10 +154,76 @@ class MainActivity : FlutterActivity() {
                     }
                     "clearAppCache" -> {
                         try {
-                            val clearedSize = clearAppCache()
+                            val clearedSize = systemCleaner.clearAppCache()
                             result.success("Cleared ${clearedSize}MB of app cache")
                         } catch (e: Exception) {
                             result.error("APP_CACHE_ERROR", "Failed to clear app cache: ${e.message}", null)
+                        }
+                    }
+                    "performFullCleanup" -> {
+                        try {
+                            val results = systemCleaner.performFullCleanup()
+                            result.success(results)
+                        } catch (e: Exception) {
+                            result.error("FULL_CLEANUP_ERROR", "Failed to perform full cleanup: ${e.message}", null)
+                        }
+                    }
+                    
+                    // 🆕 NEW ENHANCED METHODS
+                    "killAllRunningApps" -> {
+                        try {
+                            val results = systemCleaner.killAllRunningApps()
+                            result.success(results)
+                        } catch (e: Exception) {
+                            result.error("KILL_ALL_ERROR", "Failed to kill all apps: ${e.message}", null)
+                        }
+                    }
+                    "clearAllCache" -> {
+                        try {
+                            val results = systemCleaner.clearAllCache()
+                            result.success(results)
+                        } catch (e: Exception) {
+                            result.error("CLEAR_ALL_CACHE_ERROR", "Failed to clear all cache: ${e.message}", null)
+                        }
+                    }
+                    "deleteTemporaryFiles" -> {
+                        try {
+                            val results = systemCleaner.deleteTemporaryFiles()
+                            result.success(results)
+                        } catch (e: Exception) {
+                            result.error("DELETE_TEMP_ERROR", "Failed to delete temp files: ${e.message}", null)
+                        }
+                    }
+                    "clearJunkFiles" -> {
+                        try {
+                            val results = systemCleaner.clearJunkFiles()
+                            result.success(results)
+                        } catch (e: Exception) {
+                            result.error("CLEAR_JUNK_ERROR", "Failed to clear junk files: ${e.message}", null)
+                        }
+                    }
+                    "clearMemory" -> {
+                        try {
+                            val results = systemCleaner.clearMemory()
+                            result.success(results)
+                        } catch (e: Exception) {
+                            result.error("CLEAR_MEMORY_ERROR", "Failed to clear memory: ${e.message}", null)
+                        }
+                    }
+                    "performDeepCleanup" -> {
+                        try {
+                            val results = systemCleaner.performDeepCleanup()
+                            result.success(results)
+                        } catch (e: Exception) {
+                            result.error("DEEP_CLEANUP_ERROR", "Failed to perform deep cleanup: ${e.message}", null)
+                        }
+                    }
+                    "getSystemStats" -> {
+                        try {
+                            val stats = systemCleaner.getSystemStats()
+                            result.success(stats)
+                        } catch (e: Exception) {
+                            result.error("SYSTEM_STATS_ERROR", "Failed to get system stats: ${e.message}", null)
                         }
                     }
                     else -> {
@@ -228,151 +288,5 @@ class MainActivity : FlutterActivity() {
         GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "customNativeAd")
         GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "customNativeAdMedium")
         GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "customNativeAdFull")
-    }
-
-    // 🧹 EXISTING SYSTEM CLEANER FUNCTIONS (giữ nguyên)
-    
-    private fun forceGarbageCollection() {
-        System.gc()
-        Runtime.getRuntime().gc()
-        Thread.sleep(100)
-        System.gc()
-        println("🗑️ Garbage Collection completed")
-    }
-    
-    private fun clearSystemCache(): Long {
-        var clearedSize = 0L
-        
-        try {
-            val cacheDir = cacheDir
-            if (cacheDir != null && cacheDir.exists()) {
-                clearedSize = deleteFolderRecursively(cacheDir)
-            }
-            
-            val externalCacheDir = externalCacheDir
-            if (externalCacheDir != null && externalCacheDir.exists()) {
-                clearedSize += deleteFolderRecursively(externalCacheDir)
-            }
-            
-            println("🧹 System cache cleared: ${clearedSize / (1024 * 1024)}MB")
-            
-        } catch (e: Exception) {
-            println("❌ Error clearing system cache: ${e.message}")
-        }
-        
-        return clearedSize / (1024 * 1024)
-    }
-    
-    private fun getMemoryInfo(): Map<String, Any> {
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val memoryInfo = ActivityManager.MemoryInfo()
-        activityManager.getMemoryInfo(memoryInfo)
-        
-        val totalRAM = memoryInfo.totalMem / (1024 * 1024)
-        val availableRAM = memoryInfo.availMem / (1024 * 1024)
-        val usedRAM = totalRAM - availableRAM
-        val memoryThreshold = memoryInfo.threshold / (1024 * 1024)
-        
-        return mapOf(
-            "totalRAM" to totalRAM,
-            "availableRAM" to availableRAM,
-            "usedRAM" to usedRAM,
-            "memoryThreshold" to memoryThreshold,
-            "isLowMemory" to memoryInfo.lowMemory
-        )
-    }
-    
-    private fun getStorageInfo(): Map<String, Any> {
-        val stat = StatFs(Environment.getDataDirectory().path)
-        val bytesAvailable = stat.blockSizeLong * stat.availableBlocksLong
-        val bytesTotal = stat.blockSizeLong * stat.blockCountLong
-        val bytesUsed = bytesTotal - bytesAvailable
-        
-        return mapOf(
-            "totalStorage" to bytesTotal / (1024 * 1024),
-            "availableStorage" to bytesAvailable / (1024 * 1024),
-            "usedStorage" to bytesUsed / (1024 * 1024)
-        )
-    }
-    
-    private fun killBackgroundApps(): Int {
-        var killedCount = 0
-        
-        try {
-            val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            val runningApps = activityManager.runningAppProcesses
-            val packageManager = packageManager
-            
-            runningApps?.forEach { processInfo ->
-                try {
-                    if (processInfo.processName != packageName && 
-                        processInfo.importance > ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
-                        android.os.Process.killProcess(processInfo.pid)
-                        killedCount++
-                    }
-                } catch (e: Exception) {
-                    // Ignore
-                }
-            }
-            
-            println("⚡ Killed $killedCount background processes")
-            
-        } catch (e: Exception) {
-            println("❌ Error killing background apps: ${e.message}")
-        }
-        
-        return killedCount
-    }
-    
-    private fun clearAppCache(): Long {
-        var clearedSize = 0L
-        
-        try {
-            val cacheDir = cacheDir
-            if (cacheDir?.exists() == true) {
-                clearedSize += deleteFolderRecursively(cacheDir)
-            }
-            
-            val externalCacheDir = externalCacheDir  
-            if (externalCacheDir?.exists() == true) {
-                clearedSize += deleteFolderRecursively(externalCacheDir)
-            }
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val codeCacheDir = codeCacheDir
-                if (codeCacheDir?.exists() == true) {
-                    clearedSize += deleteFolderRecursively(codeCacheDir)
-                }
-            }
-            
-        } catch (e: Exception) {
-            println("❌ Error clearing app cache: ${e.message}")
-        }
-        
-        return clearedSize / (1024 * 1024)
-    }
-    
-    private fun deleteFolderRecursively(folder: File): Long {
-        var deletedSize = 0L
-        
-        try {
-            if (folder.exists()) {
-                folder.listFiles()?.forEach { file ->
-                    if (file.isDirectory) {
-                        deletedSize += deleteFolderRecursively(file)
-                    } else {
-                        val size = file.length()
-                        if (file.delete()) {
-                            deletedSize += size
-                        }
-                    }
-                }
-                folder.delete()
-            }
-        } catch (e: Exception) {
-            println("❌ Error deleting folder ${folder.path}: ${e.message}")
-        }
-        
-        return deletedSize
     }
 }

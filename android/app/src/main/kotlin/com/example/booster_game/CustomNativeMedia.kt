@@ -1,6 +1,5 @@
 package com.example.booster_game
 
-
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
@@ -17,7 +16,7 @@ import io.flutter.plugins.googlemobileads.GoogleMobileAdsPlugin
 
 /**
  * Custom Native Ad Medium Factory để tạo layout tùy chỉnh cho medium native ads
- * Layout: Image lớn ở trên, title + description ở dưới, button install full width
+ * Layout: AD badge + Play button ở trên, Image lớn ở giữa, title + description ở dưới
  */
 class CustomNativeAdMediumFactory(private val context: Context) : GoogleMobileAdsPlugin.NativeAdFactory {
 
@@ -39,23 +38,34 @@ class CustomNativeAdMediumFactory(private val context: Context) : GoogleMobileAd
             setPadding(dpToPx(12), dpToPx(12), dpToPx(12), dpToPx(12))
         }
 
-        // AD badge
-        val adBadge = TextView(context).apply {
+        // Top container chỉ có Play button
+        val topContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(0, 0, 0, dpToPx(8))
+                setMargins(0, 0, 0, dpToPx(12))
             }
+        }
+
+        // Play button - Full width, large size
+        val playButton = Button(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#4CAF50"))
-                cornerRadius = dpToPx(4).toFloat()
+                setColor(Color.parseColor("#00D4AA")) // Màu xanh mint như trong hình
+                cornerRadius = dpToPx(8).toFloat() // Bo góc vuông vắn hơn
             }
-            setPadding(dpToPx(6), dpToPx(2), dpToPx(6), dpToPx(2))
-            setTextColor(Color.WHITE)
-            textSize = 10f
+            setTextColor(Color.BLACK) // Chữ đen như trong hình
+            textSize = 16f // Tăng kích thước chữ
             setTypeface(null, Typeface.BOLD)
-            text = "AD"
+            text = "PLAY"
+            isAllCaps = true
+            setPadding(0, dpToPx(14), 0, dpToPx(14)) // Tăng padding dọc
+            gravity = Gravity.CENTER
         }
 
         // Media placeholder (ImageView, sẽ thay bằng MediaView nếu có video)
@@ -94,7 +104,7 @@ class CustomNativeAdMediumFactory(private val context: Context) : GoogleMobileAd
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(0, 0, 0, dpToPx(12))
+                setMargins(0, 0, 0, dpToPx(8))
             }
             setTextColor(Color.GRAY)
             textSize = 12f
@@ -102,31 +112,61 @@ class CustomNativeAdMediumFactory(private val context: Context) : GoogleMobileAd
             text = "Install video maker app for free!"
         }
 
-        // Install button
-        val installButton = Button(context).apply {
+        // Bottom container for AD badge and Title
+        val bottomContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            background = GradientDrawable().apply {
-                setColor(Color.parseColor("#4CAF50"))
-                cornerRadius = dpToPx(8).toFloat()
-            }
-            setTextColor(Color.WHITE)
-            textSize = 14f
-            setTypeface(null, Typeface.BOLD)
-            text = "INSTALL"
-            isAllCaps = true
-            setPadding(0, dpToPx(12), 0, dpToPx(12))
-            gravity = Gravity.CENTER
+            gravity = Gravity.CENTER_VERTICAL
         }
 
-        // Add to container
-        mainContainer.addView(adBadge)
+        // AD badge
+        val adBadge = TextView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, dpToPx(8), 0)
+            }
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#4CAF50"))
+                cornerRadius = dpToPx(4).toFloat()
+            }
+            setPadding(dpToPx(6), dpToPx(2), dpToPx(6), dpToPx(2))
+            setTextColor(Color.WHITE)
+            textSize = 10f
+            setTypeface(null, Typeface.BOLD)
+            text = "AD"
+        }
+
+        // Title for bottom container
+        val bottomTitleView = TextView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1f
+            )
+            setTextColor(Color.WHITE)
+            textSize = 16f
+            setTypeface(null, Typeface.BOLD)
+            maxLines = 1
+            text = "Title ads"
+        }
+
+        // Add views to top container
+        topContainer.addView(playButton)
+
+        // Add views to bottom container
+        bottomContainer.addView(adBadge)
+        bottomContainer.addView(bottomTitleView)
+
+        // Add to main container
+        mainContainer.addView(topContainer)
         mainContainer.addView(mediaView)
-        mainContainer.addView(titleView)
         mainContainer.addView(descView)
-        mainContainer.addView(installButton)
+        mainContainer.addView(bottomContainer)
 
         adView.addView(mainContainer)
 
@@ -137,21 +177,33 @@ class CustomNativeAdMediumFactory(private val context: Context) : GoogleMobileAd
                 setMediaContent(nativeAd.mediaContent)
             }
             mainContainer.removeView(mediaView)
-            mainContainer.addView(nativeMediaView, 1)
+            mainContainer.addView(nativeMediaView, 1) // Index 1 vì topContainer ở index 0
             adView.mediaView = nativeMediaView
         } else if (!nativeAd.images.isNullOrEmpty()) {
             mediaView.setImageDrawable(nativeAd.images[0].drawable)
             adView.imageView = mediaView
         }
 
-        nativeAd.headline?.let { titleView.text = it }
+        nativeAd.headline?.let { 
+            titleView.text = it 
+            bottomTitleView.text = it
+        }
         nativeAd.body?.let { descView.text = it }
-        nativeAd.callToAction?.let { installButton.text = it.uppercase() }
+        // Sử dụng call to action cho play button, hoặc giữ "PLAY" mặc định
+        nativeAd.callToAction?.let { 
+            playButton.text = if (it.contains("install", ignoreCase = true) || 
+                                  it.contains("download", ignoreCase = true) || 
+                                  it.contains("get", ignoreCase = true)) {
+                "PLAY"
+            } else {
+                it.uppercase()
+            }
+        }
 
         // Register views
-        adView.headlineView = titleView
+        adView.headlineView = bottomTitleView
         adView.bodyView = descView
-        adView.callToActionView = installButton
+        adView.callToActionView = playButton
 
         adView.setNativeAd(nativeAd)
 

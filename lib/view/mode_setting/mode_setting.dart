@@ -42,289 +42,356 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
     final controller = Get.find<ModeSettingController>();
     return Scaffold(
       backgroundColor: const Color(0xFF18181B),
-
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF18181B),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.arrow_back_ios, color: Color(0xFF00FFB3), size: 16),
-              Icon(Icons.arrow_back_ios, color: Color(0xFF00FFB3), size: 16),
-            ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/main.png'),
+              fit: BoxFit.cover,
+            ),
           ),
-          onPressed: () {
-            AdHelper.showInterstitialAd(
-              onComplete: () {
-                Get.back();
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.arrow_back_ios,
+                    color: Color(0xFF00FFB3),
+                    size: 16,
+                  ),
+                  Icon(
+                    Icons.arrow_back_ios,
+                    color: Color(0xFF00FFB3),
+                    size: 16,
+                  ),
+                ],
+              ),
+              onPressed: () {
+                AdHelper.showInterstitialAd(
+                  onComplete: () {
+                    Get.back();
+                  },
+                );
               },
-            );
-          },
-        ),
-        title: Text(
-          'mode_setting'.tr,
-          style: TextStyle(
-            fontFamily: 'Play',
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
+            ),
+            title: Text(
+              'mode_setting'.tr,
+              style: TextStyle(
+                fontFamily: 'Play',
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
           ),
         ),
       ),
-
-      bottomNavigationBar: NativeAdWithLoadingWidget(adType: ''),
-      body: ListView(
-        padding: EdgeInsets.all(16),
+      bottomNavigationBar: SafeArea(
+        child: NativeAdWithLoadingWidget(adType: ''),
+      ),
+      body: Stack(
         children: [
-          // Brightness Section
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF18181B),
-              border: Border.all(
-                color: const Color(0xFFFFFFFF).withOpacity(0.05),
-              ),
-            ),
-            child: Column(
-              children: [
-                Obx(
-                  () => SwitchListTile(
-                    activeColor: Color(0xFFFFFFFF),
-                    inactiveThumbColor: Color(0xFFFFFFFF),
-                    inactiveTrackColor: const Color(0xFF25252B),
-                    activeTrackColor: Color(0xFF00FFB3),
-                    title: Text(
-                      'bright'.tr,
-                      style: TextStyle(fontFamily: 'Play', color: Colors.white),
-                    ),
-                    value: controller.brightnessEnabled.value,
-                    onChanged: (val) => controller.toggleBrightness(val),
-                  ),
-                ),
-                Obx(
-                  () => Slider(
-                    activeColor: Color(0xFF00FFB3),
-                    inactiveColor: const Color(0xFF25252B),
-                    thumbColor: Color(0xFFFFFFFF),
-                    value: controller.brightnessLevel.value,
-                    min: 0,
-                    max: 100,
-                    divisions: 100,
-                    label: '${controller.brightnessLevel.value.round()}%',
-                    onChanged:
-                        controller.brightnessEnabled.value
-                            ? (val) => controller.updateBrightness(val)
-                            : null,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-
-          // Ringtone Section
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF18181B),
-              border: Border.all(
-                color: const Color(0xFFFFFFFF).withOpacity(0.05),
-              ),
-            ),
-            child: Column(
-              children: [
-                Obx(
-                  () => SwitchListTile(
-                    activeColor: Color(0xFFFFFFFF),
-                    inactiveThumbColor: Color(0xFFFFFFFF),
-                    inactiveTrackColor: const Color(0xFF25252B),
-                    activeTrackColor: Color(0xFF00FFB3),
-                    title: Text(
-                      'ringtone'.tr,
-                      style: TextStyle(fontFamily: 'Play', color: Colors.white),
-                    ),
-                    value: controller.ringtoneEnabled.value,
-                    onChanged: (val) => controller.toggleRingtone(val),
-                  ),
-                ),
-                Obx(
-                  () => Slider(
-                    activeColor: Color(0xFF00FFB3),
-                    inactiveColor: const Color(0xFF25252B),
-                    thumbColor: Color(0xFFFFFFFF),
-                    value: controller.ringtoneVolume.value,
-                    min: 0,
-                    max: 100,
-                    divisions: 100,
-                    label: '${controller.ringtoneVolume.value.round()}%',
-                    onChanged:
-                        controller.ringtoneEnabled.value
-                            ? (val) => controller.updateRingtoneVolume(val)
-                            : null,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-
-          // Media Section
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF18181B),
-              border: Border.all(
-                // ignore: deprecated_member_use
-                color: const Color(0xFFFFFFFF).withOpacity(0.05),
-              ),
-            ),
-            child: Column(
-              children: [
-                Obx(
-                  () => SwitchListTile(
-                    activeColor: Color(0xFFFFFFFF),
-                    inactiveThumbColor: Color(0xFFFFFFFF),
-                    inactiveTrackColor: const Color(0xFF25252B),
-                    activeTrackColor: Color(0xFF00FFB3),
-                    title: Text(
-                      'media'.tr,
-                      style: TextStyle(fontFamily: 'Play', color: Colors.white),
-                    ),
-                    value: controller.mediaEnabled.value,
-                    onChanged: (val) => controller.toggleMedia(val),
-                  ),
-                ),
-                Obx(
-                  () => Slider(
-                    activeColor: Color(0xFF00FFB3),
-                    inactiveColor: const Color(0xFF25252B),
-                    thumbColor: Color(0xFFFFFFFF),
-                    value: controller.mediaVolume.value,
-                    min: 0,
-                    max: 100,
-                    divisions: 100,
-                    label: '${controller.mediaVolume.value.round()}%',
-                    onChanged:
-                        controller.mediaEnabled.value
-                            ? (val) => controller.updateMediaVolume(val)
-                            : null,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-
-          // Auto Reject Call
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF18181B),
-              border: Border.all(
-                color: const Color(0xFFFFFFFF).withOpacity(0.05),
-              ),
-            ),
-            child: Obx(
-              () => SwitchListTile(
-                activeColor: Color(0xFFFFFFFF),
-                inactiveThumbColor: Color(0xFFFFFFFF),
-                inactiveTrackColor: const Color(0xFF25252B),
-                activeTrackColor: Color(0xFF00FFB3),
-                title: Text(
-                  'call'.tr,
-                  style: TextStyle(fontFamily: 'Play', color: Colors.white),
-                ),
-                value: controller.autoRejectCall.value,
-                onChanged: (val) => controller.toggleAutoRejectCall(val),
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-
-          // Notification Block
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF18181B),
-              border: Border.all(
-                // ignore: deprecated_member_use
-                color: const Color(0xFFFFFFFF).withOpacity(0.05),
-              ),
-            ),
-            child: Obx(
-              () => SwitchListTile(
-                activeColor: Color(0xFFFFFFFF),
-                inactiveThumbColor: Color(0xFFFFFFFF),
-                inactiveTrackColor: const Color(0xFF25252B),
-                activeTrackColor: Color(0xFF00FFB3),
-                title: Text(
-                  'notification'.tr,
-                  style: TextStyle(fontFamily: 'Play', color: Colors.white),
-                ),
-                value: controller.notificationBlock.value,
-                onChanged: (val) => controller.toggleNotification(val),
-              ),
-            ),
+          // Background Image
+          Positioned.fill(
+            child: Image.asset('assets/images/main.png', fit: BoxFit.cover),
           ),
 
-          SizedBox(height: 10),
-
-          // FPS Options
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF18181B),
-              border: Border.all(
-                // ignore: deprecated_member_use
-                color: const Color(0xFFFFFFFF).withOpacity(0.05),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(bottom: 16.0),
-                  child: Text(
-                    'FPS',
-                    style: TextStyle(
-                      fontFamily: 'Play',
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
+          // Content
+          ListView(
+            padding: EdgeInsets.all(16),
+            children: [
+              // Brightness Section
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFFFFFFF).withOpacity(0.05),
                   ),
                 ),
-                Obx(
-                  () => Column(
-                    children: [
-                      // First row: 60 FPS and 90 FPS
-                      Row(
-                        children: [
-                          Expanded(child: _buildFpsOption(60, controller)),
-                          SizedBox(width: 12),
-                          Expanded(child: _buildFpsOption(90, controller)),
-                        ],
+                child: Column(
+                  children: [
+                    Obx(
+                      () => SwitchListTile(
+                        activeColor: Color(0xFFFFFFFF),
+                        inactiveThumbColor: Color(0xFFFFFFFF),
+                        inactiveTrackColor: Colors.transparent,
+                        activeTrackColor: Color(0xFF00FFB3),
+                        title: Text(
+                          'bright'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Play',
+                            color: Colors.white,
+                          ),
+                        ),
+                        value: controller.brightnessEnabled.value,
+                        onChanged: (val) => controller.toggleBrightness(val),
                       ),
-                      SizedBox(height: 12),
-                      // Second row: 120 FPS and 144 FPS
-                      Row(
+                    ),
+                    Obx(
+                      () => SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          thumbShape:
+                              controller.brightnessEnabled.value
+                                  ? const RoundSliderThumbShape(
+                                    enabledThumbRadius: 8,
+                                  ) // Có chấm tròn
+                                  : SliderComponentShape
+                                      .noThumb, // Không có chấm tròn
+                        ),
+                        child: Slider(
+                          activeColor: const Color(0xFF00FFB3),
+                          inactiveColor: const Color(0xFF25252B),
+                          value: controller.brightnessLevel.value,
+                          thumbColor: Color(0xFFFFFFFF),
+                          min: 0,
+                          max: 100,
+                          divisions: 100,
+                          label: '${controller.brightnessLevel.value.round()}%',
+                          onChanged:
+                              controller.brightnessEnabled.value
+                                  ? (val) => controller.updateBrightness(val)
+                                  : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // Ringtone Section
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFFFFFFF).withOpacity(0.05),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Obx(
+                      () => SwitchListTile(
+                        activeColor: Color(0xFFFFFFFF),
+                        inactiveThumbColor: Color(0xFFFFFFFF),
+                        inactiveTrackColor: Colors.transparent,
+                        activeTrackColor: Color(0xFF00FFB3),
+                        title: Text(
+                          'ringtone'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Play',
+                            color: Colors.white,
+                          ),
+                        ),
+                        value: controller.ringtoneEnabled.value,
+                        onChanged: (val) => controller.toggleRingtone(val),
+                      ),
+                    ),
+                    Obx(
+                      () => SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          thumbShape:
+                              controller.ringtoneEnabled.value
+                                  ? const RoundSliderThumbShape(
+                                    enabledThumbRadius: 8,
+                                  ) // Có chấm tròn
+                                  : SliderComponentShape
+                                      .noThumb, // Không có chấm tròn
+                        ),
+                        child: Slider(
+                          activeColor: Color(0xFF00FFB3),
+                          inactiveColor: const Color(0xFF25252B),
+                          thumbColor: Color(0xFFFFFFFF),
+                          value: controller.ringtoneVolume.value,
+                          min: 0,
+                          max: 100,
+                          divisions: 100,
+                          label: '${controller.ringtoneVolume.value.round()}%',
+                          onChanged:
+                              controller.ringtoneEnabled.value
+                                  ? (val) =>
+                                      controller.updateRingtoneVolume(val)
+                                  : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // Media Section
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFFFFFFF).withOpacity(0.05),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Obx(
+                      () => SwitchListTile(
+                        activeColor: Color(0xFFFFFFFF),
+                        inactiveThumbColor: Color(0xFFFFFFFF),
+                        inactiveTrackColor: Colors.transparent,
+                        activeTrackColor: Color(0xFF00FFB3),
+                        title: Text(
+                          'media'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Play',
+                            color: Colors.white,
+                          ),
+                        ),
+                        value: controller.mediaEnabled.value,
+                        onChanged: (val) => controller.toggleMedia(val),
+                      ),
+                    ),
+                    Obx(
+                      () => SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          thumbShape:
+                              controller.mediaEnabled.value
+                                  ? const RoundSliderThumbShape(
+                                    enabledThumbRadius: 8,
+                                  ) // Có chấm tròn
+                                  : SliderComponentShape
+                                      .noThumb, // Không có chấm tròn
+                        ),
+                        child: Slider(
+                          activeColor: Color(0xFF00FFB3),
+                          inactiveColor: const Color(0xFF25252B),
+                          thumbColor: Color(0xFFFFFFFF),
+                          value: controller.mediaVolume.value,
+                          min: 0,
+                          max: 100,
+                          divisions: 100,
+                          label: '${controller.mediaVolume.value.round()}%',
+                          onChanged:
+                              controller.mediaEnabled.value
+                                  ? (val) => controller.updateMediaVolume(val)
+                                  : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // Auto Reject Call
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFFFFFFF).withOpacity(0.05),
+                  ),
+                ),
+                child: Obx(
+                  () => SwitchListTile(
+                    activeColor: Color(0xFFFFFFFF),
+                    inactiveThumbColor: Color(0xFFFFFFFF),
+                    inactiveTrackColor: Colors.transparent,
+                    activeTrackColor: Color(0xFF00FFB3),
+                    title: Text(
+                      'call'.tr,
+                      style: TextStyle(fontFamily: 'Play', color: Colors.white),
+                    ),
+                    value: controller.autoRejectCall.value,
+                    onChanged: (val) => controller.toggleAutoRejectCall(val),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+
+              // Notification Block
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFFFFFFF).withOpacity(0.05),
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Obx(
+                  () => SwitchListTile(
+                    activeColor: Color(0xFFFFFFFF),
+                    inactiveThumbColor: Color(0xFFFFFFFF),
+                    inactiveTrackColor: Colors.transparent,
+                    activeTrackColor: Color(0xFF00FFB3),
+                    title: Text(
+                      'notification'.tr,
+                      style: TextStyle(fontFamily: 'Play', color: Colors.white),
+                    ),
+                    value: controller.notificationBlock.value,
+                    onChanged: (val) => controller.toggleNotification(val),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 10),
+
+              // FPS Options
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFFFFFFFF).withOpacity(0.05),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 16.0),
+                      child: Text(
+                        'FPS',
+                        style: TextStyle(
+                          fontFamily: 'Play',
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Obx(
+                      () => Column(
                         children: [
-                          Expanded(child: _buildFpsOption(120, controller)),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: _buildFpsOption(
-                              144,
-                              controller,
-                            ), // Changed from 150 to 144
+                          // First row: 60 FPS and 90 FPS
+                          Row(
+                            children: [
+                              Expanded(child: _buildFpsOption(60, controller)),
+                              SizedBox(width: 12),
+                              Expanded(child: _buildFpsOption(90, controller)),
+                            ],
+                          ),
+                          SizedBox(height: 12),
+                          // Second row: 120 FPS and 144 FPS
+                          Row(
+                            children: [
+                              Expanded(child: _buildFpsOption(120, controller)),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: _buildFpsOption(
+                                  144,
+                                  controller,
+                                ), // Changed from 150 to 144
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -337,15 +404,17 @@ class _ModeSettingScreenState extends State<ModeSettingScreen> {
 
     return GestureDetector(
       onTap: () {
-        controller.selectedFps.value = fps;
+        // Use the new updateFpsSelection method to save the state
+        controller.updateFpsSelection(fps);
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFF25252B),
-
           border: Border.all(
-            color: isSelected ? const Color(0xFF00FFB3) : Colors.transparent,
+            color:
+                isSelected
+                    ? const Color(0xFF00FFB3)
+                    : Color(0xFFFFFFFF).withOpacity(0.05),
             width: 1,
           ),
         ),

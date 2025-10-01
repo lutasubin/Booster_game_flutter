@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:201281154378:android:1e5ae137c4e63c6c26e5b3",
+        "mobilesdk_app_id": "1:201281154378:android:7bb9b1aaa4cedc9626e5b3",
         "android_client_info": {
-          "package_name": "com.example.booster_game"
+          "package_name": "com.lutasubin.boostergame"
         }
       },
       "oauth_client": [],

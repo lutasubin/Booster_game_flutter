@@ -1,4 +1,4 @@
-package com.example.booster_game
+package com.lutasubin.boostergame
 
 import android.os.Bundle
 import com.google.android.ump.*

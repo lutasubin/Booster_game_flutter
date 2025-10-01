@@ -1,4 +1,4 @@
-package com.example.booster_game
+package com.lutasubin.boostergame
 
 import android.content.Context
 import android.app.ActivityManager

@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration (nếu dùng Firebase)
@@ -7,15 +10,21 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Load key.properties
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
-    namespace = "com.example.booster_game"
+    namespace = "com.lutasubin.boostergame"
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        // Hỗ trợ Java 8+ API trên Android cũ
         isCoreLibraryDesugaringEnabled = true
     }
 
@@ -24,20 +33,32 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.booster_game"
+        applicationId = "com.lutasubin.boostergame"
         minSdk = 23
         targetSdk = 35
-        versionCode = 1
+        versionCode = 4
         versionName = "1.0"
-
-        // Nếu dùng nhiều SDK thì nên bật
         multiDexEnabled = true
+    }
+
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+        }
     }
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("debug")
-          
+            // ✅ Tắt code shrink và resource shrink để tránh lỗi
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("release")
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }

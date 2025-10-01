@@ -163,11 +163,11 @@ class GameModeSelectionScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    AdHelper.showInterstitialAd(
-                      onComplete: () {
-                        Get.off(() => AppSelectionScreen());
-                      },
-                    );
+                    // AdHelper.showInterstitialAd(
+                    //   onComplete: () {
+                    //     Get.off(() => AppSelectionScreen());
+                    //   },
+                    // );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF00FFB3),

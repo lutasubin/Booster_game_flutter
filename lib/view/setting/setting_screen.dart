@@ -5,6 +5,7 @@ import 'package:booster_game/view/setting/rate_app/rating.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -98,17 +99,17 @@ class _MenuScreenState extends State<MenuScreen> {
                     Get.off(() => LanguageSelectionScreen());
                   },
                 ),
-                const SizedBox(height: 20),
-                _buildMenuItem(
-                  context: context,
-                  icon: Icons.star,
-                  iconColor: Colors.white,
-                  title: 'rate_app'.tr,
-                  onTap: () {
-                    AnalyticsHelper.logSettingChange('open_rating', 'clicked');
-                    showRatingBottomSheet(context);
-                  },
-                ),
+                // const SizedBox(height: 20),
+                // _buildMenuItem(
+                //   context: context,
+                //   icon: Icons.star,
+                //   iconColor: Colors.white,
+                //   title: 'rate_app'.tr,
+                //   onTap: () {
+                //     AnalyticsHelper.logSettingChange('open_rating', 'clicked');
+                //     showRatingBottomSheet(context);
+                //   },
+                // ),
                 const SizedBox(height: 20),
                 _buildMenuItem(
                   context: context,
@@ -134,6 +135,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       'open_privacy_policy',
                       'clicked',
                     );
+                    _openPrivacyPolicy();
                   },
                 ),
               ],
@@ -188,6 +190,12 @@ class _MenuScreenState extends State<MenuScreen> {
       ),
     );
   }
+
+  Future<void> _openPrivacyPolicy() async {
+  final Uri url = Uri.parse("https://sites.google.com/view/policegameboosterpro/trang-ch%E1%BB%A7");
+  if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+    throw Exception("Could not launch $url");
+  }
 }
 
 void showRatingBottomSheet(BuildContext context) {
@@ -200,4 +208,5 @@ void showRatingBottomSheet(BuildContext context) {
     backgroundColor: Colors.transparent,
     builder: (_) => const RatingBottomSheet(),
   );
+}
 }

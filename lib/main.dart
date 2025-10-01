@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +15,11 @@ Future<void> main() async {
 
   //firebase initialization
   await Firebase.initializeApp();
+
+  // ✅ Khai báo thiết bị test
+  MobileAds.instance.updateRequestConfiguration(
+    RequestConfiguration(testDeviceIds: ['24117RN76O']),
+  );
 
   //initializing remote config
   await Config.initConfig();

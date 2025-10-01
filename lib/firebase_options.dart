@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBPioQClR4AR4YHxwkvLQOiZoHVSelmrKU',
-    appId: '1:201281154378:android:1e5ae137c4e63c6c26e5b3',
+    appId: '1:201281154378:android:7bb9b1aaa4cedc9626e5b3',
     messagingSenderId: '201281154378',
     projectId: 'booster-game-c499f',
     storageBucket: 'booster-game-c499f.firebasestorage.app',
@@ -59,10 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBPxRdVPIA3QOcAf_0IvV1fmcLpi8BqRLk',
-    appId: '1:201281154378:ios:430924b5576916a426e5b3',
+    appId: '1:201281154378:ios:7178f5b1f73b919d26e5b3',
     messagingSenderId: '201281154378',
     projectId: 'booster-game-c499f',
     storageBucket: 'booster-game-c499f.firebasestorage.app',
-    iosBundleId: 'com.example.boosterGame',
+    iosBundleId: 'com.lutasubin.boostergame',
   );
+
 }

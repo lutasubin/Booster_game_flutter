@@ -1,12 +1,10 @@
 import 'package:booster_game/controller/mode_game/mode_controller.dart';
-import 'package:booster_game/helper/gg_ads/ads_setup.dart';
 import 'package:booster_game/model/features.dart';
 import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:booster_game/view/app_selection/app_selection.dart';
 
 class GameModeSelectionScreen extends StatelessWidget {
   const GameModeSelectionScreen({super.key});
@@ -161,31 +159,37 @@ class GameModeSelectionScreen extends StatelessWidget {
             SafeArea(
               child: SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
+                child: InkWell(
+                  onTap: () {
                     // AdHelper.showInterstitialAd(
                     //   onComplete: () {
                     //     Get.off(() => AppSelectionScreen());
                     //   },
                     // );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00FFB3),
-                    foregroundColor: Colors.black,
+                  child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
+                      vertical: 14,
+                      horizontal: 20,
                     ),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFF00FFB3),
+                        width: 1.5,
+                      ),
+                      color: Colors.transparent,
                     ),
-                  ),
-                  child: Text(
-                    'play_game'.tr,
-                    style: const TextStyle(
-                      fontFamily: 'Play',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                    child: Center(
+                      child: Text(
+                        "Boosting done, close the app and open your game",
+                        style: const TextStyle(
+                          fontFamily: 'Play',
+                          fontSize: 14,
+                          color: Color(0xFF00FFB3),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),

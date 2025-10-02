@@ -28,7 +28,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     OnboardingItem(
       title: "REAL-TIME PERFORMANCE",
       subtitle: "Real-time boost. Faster, sharper, unstoppable",
-      assetImage: "assets/images/image2.png",
+      assetImage: "assets/images/image4.png",
       buttonText: 'Next',
     ),
     OnboardingItem(

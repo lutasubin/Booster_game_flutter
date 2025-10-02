@@ -1,7 +1,7 @@
-import 'package:booster_game/controller/app_selections_controller/app_controller.dart';
 import 'package:booster_game/controller/home_controller/home_controller.dart';
 import 'package:booster_game/controller/mode_setting_controller/mode_setting_controller.dart';
 import 'package:booster_game/controller/splash_controller/splash_controller.dart';
+import 'package:booster_game/controller/vpn_controller/vpn_controller.dart';
 import 'package:get/get.dart';
 
 class AppBinding extends Bindings {
@@ -12,11 +12,10 @@ class AppBinding extends Bindings {
 
     // Khởi tạo ModeSettingController
     Get.put<ModeSettingController>(ModeSettingController(), permanent: true);
+    // Khởi tạo VpnController
+    Get.put<VpnController>(VpnController(), permanent: true);
 
     // Khởi tạo SplashController (không cần permanent)
     Get.lazyPut<SplashController>(() => SplashController());
-
-    // Khoi tao App lay app 
-    Get.put<AppSelectionController>(AppSelectionController(),permanent: true);
   }
 }

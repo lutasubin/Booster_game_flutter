@@ -47,7 +47,7 @@ dependencies:
   device_info_plus: ^11.5.0
 
   # Lay app device
-  installed_apps: ^1.6.0
+ 
 
   # Share app
   share_plus: ^7.2.1
@@ -110,6 +110,7 @@ flutter:
      - assets/images/
      - assets/svg/ 
      - assets/fonts/
+     - assets/flags/
 
   # To add fonts to your application, add an fonts section, like this:
   fonts:

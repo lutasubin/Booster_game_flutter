@@ -36,7 +36,7 @@ android {
         applicationId = "com.lutasubin.boostergame"
         minSdk = 23
         targetSdk = 35
-        versionCode = 4
+        versionCode = 5
         versionName = "1.0"
         multiDexEnabled = true
     }

@@ -19,31 +19,31 @@ class GaugeCircle extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 90,
-          height: 90,
+          width: 100,
+          height: 100,
           child: CustomPaint(
             painter: GaugePainter(percentage: percentage, color: color),
             child: Center(
               child: Text(
                 "$percentage%",
                 style: const TextStyle(
-                  fontFamily: 'Play',
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'Play',
                 ),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'Play',
             color: Colors.white,
             fontSize: 14,
             fontWeight: FontWeight.bold,
+            fontFamily: 'Play',
           ),
         ),
       ],
@@ -62,38 +62,31 @@ class GaugePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
 
-    // Vẽ vòng tròn viền trắng ngoài
-    final borderPaint =
+    // Vòng tròn nền mờ
+    final backgroundPaint =
         Paint()
-          ..color = Colors.white
+          ..color = Colors.grey[850]!
+          ..strokeWidth = 8
+          ..style = PaintingStyle.stroke;
+         
+    canvas.drawCircle(center, radius - 10, backgroundPaint);
+
+    // Vòng tròn màu chính (1 màu)
+    final progressPaint =
+        Paint()
+          ..color = color
+          ..strokeWidth = 8
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 3;
-    canvas.drawCircle(center, radius - 1, borderPaint);
+          ..strokeCap = StrokeCap.round;
 
-    // Vẽ các vạch
-    const tickCount = 45; // tổng số vạch
-    final tickPaint =
-        Paint()
-          ..strokeWidth = 3
-          ..strokeCap = StrokeCap.butt;
-
-    final activeTicks = (percentage / 100 * tickCount).round();
-
-    for (int i = 0; i < tickCount; i++) {
-      final angle = (i / tickCount) * 2 * math.pi - math.pi / 2;
-
-      tickPaint.color = i < activeTicks ? color : Colors.grey[800]!;
-
-      const tickLength = 8.0;
-
-      final startX = center.dx + (radius - tickLength - 4) * math.cos(angle);
-      final startY = center.dy + (radius - tickLength - 4) * math.sin(angle);
-
-      final endX = center.dx + (radius - 4) * math.cos(angle);
-      final endY = center.dy + (radius - 4) * math.sin(angle);
-
-      canvas.drawLine(Offset(startX, startY), Offset(endX, endY), tickPaint);
-    }
+    final sweepAngle = 2 * math.pi * (percentage / 100);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius - 10),
+      -math.pi / 2,
+      sweepAngle,
+      false,
+      progressPaint,
+    );
   }
 
   @override

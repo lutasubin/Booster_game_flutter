@@ -23,7 +23,7 @@ class WelcomeScreen extends StatelessWidget {
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage(
-              'assets/images/background_welcome.png',
+              'assets/images/welcome_hd.png',
             ), // Thay bằng ảnh background của bạn
             fit: BoxFit.cover,
           ),
@@ -35,7 +35,7 @@ class WelcomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Logo
-                SvgPicture.asset('assets/svg/Gaming Mode.svg'),
+                SvgPicture.asset('assets/icons/text_splash.svg'),
 
                 const SizedBox(height: 20),
 
@@ -61,18 +61,18 @@ class WelcomeScreen extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.off(
+                      Get.offAll(
                         () => HomeScreen(),
                         transition: Transition.fade,
                         duration: const Duration(milliseconds: 500),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00FFB3),
+                      backgroundColor: const Color(0xFF00FFFF),
                       foregroundColor: Colors.black,
                       elevation: 8,
                       shadowColor: const Color(
-                        0xFF00FFB3,
+                        0xFF00FFFF,
                       ).withAlpha(102), // 0.4 opacity
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.zero, // Không bo góc

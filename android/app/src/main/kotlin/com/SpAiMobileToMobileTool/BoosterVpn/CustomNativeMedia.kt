@@ -1,4 +1,5 @@
-package com.lutasubin.boostergame
+package com.SpAiMobileToMobileTool.BoosterVpn
+
 
 import android.content.Context
 import android.graphics.Color
@@ -56,7 +57,7 @@ class CustomNativeAdMediumFactory(private val context: Context) : GoogleMobileAd
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#00D4AA")) // Màu xanh mint như trong hình
+                setColor(Color.parseColor("#00FFFF")) // Màu xanh mint như trong hình
                 cornerRadius = dpToPx(8).toFloat() // Bo góc vuông vắn hơn
             }
             setTextColor(Color.BLACK) // Chữ đen như trong hình

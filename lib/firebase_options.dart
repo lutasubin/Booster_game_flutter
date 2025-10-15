@@ -50,20 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBPioQClR4AR4YHxwkvLQOiZoHVSelmrKU',
-    appId: '1:201281154378:android:7bb9b1aaa4cedc9626e5b3',
-    messagingSenderId: '201281154378',
-    projectId: 'booster-game-c499f',
-    storageBucket: 'booster-game-c499f.firebasestorage.app',
+    apiKey: 'AIzaSyAwBq2bRrL4QCi2CVPLW8TYF6ooPPvcT1s',
+    appId: '1:109354004217:android:3ce5ec0ee5fc2033713c28',
+    messagingSenderId: '109354004217',
+    projectId: 'boostervpn-8451f',
+    storageBucket: 'boostervpn-8451f.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBPxRdVPIA3QOcAf_0IvV1fmcLpi8BqRLk',
-    appId: '1:201281154378:ios:7178f5b1f73b919d26e5b3',
-    messagingSenderId: '201281154378',
-    projectId: 'booster-game-c499f',
-    storageBucket: 'booster-game-c499f.firebasestorage.app',
-    iosBundleId: 'com.lutasubin.boostergame',
+    apiKey: 'AIzaSyAq-FHfeiZAoLiiTwdQEsk3NvrG3-Hkds4',
+    appId: '1:109354004217:ios:ca45917ce3893222713c28',
+    messagingSenderId: '109354004217',
+    projectId: 'boostervpn-8451f',
+    storageBucket: 'boostervpn-8451f.firebasestorage.app',
+    iosBundleId: 'com.SpAiMobileToMobileTool.BoosterVpn',
   );
-
 }

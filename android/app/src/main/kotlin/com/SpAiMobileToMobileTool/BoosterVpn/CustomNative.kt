@@ -1,4 +1,5 @@
-package com.lutasubin.boostergame
+package com.SpAiMobileToMobileTool.BoosterVpn
+
 
 import android.content.Context
 import android.graphics.Color
@@ -54,7 +55,7 @@ class CustomNativeAdFactory(private val context: Context) : GoogleMobileAdsPlugi
                 setMargins(dpToPx(8), 0, dpToPx(8), 0)
             }
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#00FF88"))  // Bright green like in image
+                setColor(Color.parseColor("#00FFFF"))  // Bright green like in image
                 cornerRadius = dpToPx(8).toFloat()
             }
             setTextColor(Color.parseColor("#000000"))  // Black text for contrast

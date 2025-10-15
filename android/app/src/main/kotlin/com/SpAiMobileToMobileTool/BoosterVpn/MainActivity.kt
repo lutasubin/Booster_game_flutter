@@ -1,4 +1,4 @@
-package com.lutasubin.boostergame
+package com.SpAiMobileToMobileTool.BoosterVpn
 
 import android.os.Bundle
 import com.google.android.ump.*
@@ -7,6 +7,8 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugins.googlemobileads.GoogleMobileAdsPlugin
 import io.flutter.plugin.common.MethodChannel
+import id.laskarmedia.openvpn_flutter.OpenVPNFlutterPlugin
+import android.content.Intent
 
 class MainActivity : FlutterActivity() {
 
@@ -30,6 +32,12 @@ class MainActivity : FlutterActivity() {
 
         // Khởi động UMP trước khi init quảng cáo
         requestUserConsent()
+    }
+
+     // --- Thêm onActivityResult để OpenVPN hoạt động ---
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        OpenVPNFlutterPlugin.connectWhileGranted(requestCode == 24 && resultCode == RESULT_OK)
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun requestUserConsent() {

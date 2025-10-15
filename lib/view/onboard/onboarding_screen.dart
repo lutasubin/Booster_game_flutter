@@ -1,7 +1,7 @@
 import 'package:booster_game/model/onboard.dart';
 import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:booster_game/controller/splash_controller/splash_controller.dart';
-import 'package:booster_game/view/setting/lang/language_frist.dart';
+import 'package:booster_game/view/setting/lang/language_first.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,19 +23,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       subtitle:
           "Powerful performance boost giver you the best gaming experience",
       assetImage: "assets/images/image1.png",
-      buttonText: 'Next',
+      buttonText: 'NEXT',
     ),
     OnboardingItem(
       title: "REAL-TIME PERFORMANCE",
       subtitle: "Real-time boost. Faster, sharper, unstoppable",
-      assetImage: "assets/images/image4.png",
-      buttonText: 'Next',
+      assetImage: "assets/images/image2.png",
+      buttonText: 'NEXT',
     ),
     OnboardingItem(
       title: "ALL GAMES,ONE TAP AWAY",
       subtitle: "Boots every game in a tap. Faster, sharper, unstoppable",
       assetImage: "assets/images/image3.png",
-      buttonText: 'Next',
+      buttonText: 'NEXT',
     ),
   ];
 
@@ -62,8 +62,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage(
-              'assets/images/background_aboarding.png',
-            ), // Thay đổi đường dẫn hình ảnh theo ý bạn
+              'assets/icons/new_main.png',
+            ), 
             fit: BoxFit.cover,
           ),
         ),
@@ -164,7 +164,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF00FFB3),
+                      color: Color(0xFF00FFFF),
                     ),
                   ),
                 ),

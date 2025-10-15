@@ -18,16 +18,15 @@ class ModeBoosterSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color(0xFFFFFFFF).withOpacity(0.05),
-        ),
+        // ignore: deprecated_member_use
+        border: Border.all(color: const Color(0xFFFFFFFF).withOpacity(0.05)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildModeBoosterTitle(),
-          _buildToggleButtons(),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [_buildModeBoosterTitle(), _buildToggleButtons()],
+        ),
       ),
     );
   }
@@ -35,58 +34,54 @@ class ModeBoosterSection extends StatelessWidget {
   Widget _buildModeBoosterTitle() {
     return InkWell(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: Row(
-          children: [
-            Obx(
-              () => Text(
-                'mode_booster'.tr,
-                style: TextStyle(
-                  fontFamily: 'Play',
-                  color: controller.isGameModeEnabled
-                      ? Colors.white
+      child: Row(
+        children: [
+          Obx(
+            () => Text(
+              'mode_booster'.tr,
+              style: TextStyle(
+                fontFamily: 'Play',
+                color:
+                    controller.isGameModeEnabled
+                        ? Colors.white
+                        : Colors.grey[500],
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 5),
+          Obx(
+            () => SvgPicture.asset(
+              'assets/icons/mode_setting.svg',
+              // ignore: deprecated_member_use
+              color:
+                  controller.isGameModeEnabled
+                      ? const Color(0xFF00FFFF)
                       : Colors.grey[500],
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
             ),
-            const SizedBox(width: 5),
-            Obx(
-              () => SvgPicture.asset(
-                'assets/icons/setting2.svg',
-                // ignore: deprecated_member_use
-                color: controller.isGameModeEnabled
-                    ? const Color(0xFF00FFB3)
-                    : Colors.grey[500],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildToggleButtons() {
     return Obx(
-      () => Padding(
-        padding: const EdgeInsets.all(5),
-        child: Row(
-          children: [
-            _buildToggleButton(
-              label: 'OFF',
-              isActive: !controller.isGameModeEnabled,
-              onTap: () => controller.toggleGameMode(false),
-            ),
-            const SizedBox(width: 5),
-            _buildToggleButton(
-              label: 'ON',
-              isActive: controller.isGameModeEnabled,
-              onTap: () => controller.toggleGameMode(true),
-            ),
-          ],
-        ),
+      () => Row(
+        children: [
+          _buildToggleButton(
+            label: 'OFF',
+            isActive: !controller.isGameModeEnabled,
+            onTap: () => controller.toggleGameMode(false),
+          ),
+          const SizedBox(width: 5),
+          _buildToggleButton(
+            label: 'ON',
+            isActive: controller.isGameModeEnabled,
+            onTap: () => controller.toggleGameMode(true),
+          ),
+        ],
       ),
     );
   }
@@ -96,31 +91,27 @@ class ModeBoosterSection extends StatelessWidget {
     required bool isActive,
     required VoidCallback onTap,
   }) {
-    final activeColor = label == 'ON' ? const Color(0xFF00FFB3) : Colors.grey[600]!;
-    
+    final activeColor =
+        label == 'ON' ? const Color(0xFF00FFFF) : Color(0xFF00FFFF);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 8,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isActive ? activeColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(
-            color: activeColor,
-            width: 1,
-          ),
+          border: Border.all(color: activeColor, width: 1),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontFamily: 'Play',
-            color: isActive
-                ? (label == 'ON' ? Colors.black : Colors.white)
-                : Colors.grey[400],
+            color:
+                isActive
+                    ? (label == 'ON' ? Colors.black : Colors.black)
+                    : Colors.grey[400],
             fontSize: 14,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),

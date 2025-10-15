@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "201281154378",
-    "project_id": "booster-game-c499f",
-    "storage_bucket": "booster-game-c499f.firebasestorage.app"
+    "project_number": "109354004217",
+    "project_id": "boostervpn-8451f",
+    "storage_bucket": "boostervpn-8451f.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:201281154378:android:7bb9b1aaa4cedc9626e5b3",
+        "mobilesdk_app_id": "1:109354004217:android:3ce5ec0ee5fc2033713c28",
         "android_client_info": {
-          "package_name": "com.lutasubin.boostergame"
+          "package_name": "com.SpAiMobileToMobileTool.BoosterVpn"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBPioQClR4AR4YHxwkvLQOiZoHVSelmrKU"
+          "current_key": "AIzaSyAwBq2bRrL4QCi2CVPLW8TYF6ooPPvcT1s"
         }
       ],
       "services": {

@@ -1,5 +1,8 @@
 import 'package:booster_game/controller/vpn_controller/vpn_controller.dart';
+import 'package:booster_game/model/vpn_sever.dart';
+import 'package:booster_game/view/custom_ads/native_ads.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 class VpnServerScreen extends StatelessWidget {
@@ -10,38 +13,38 @@ class VpnServerScreen extends StatelessWidget {
     final VpnController controller = Get.find<VpnController>();
 
     return Scaffold(
+      bottomNavigationBar: SafeArea(child: NativeAdWithLoadingWidget()),
       backgroundColor: const Color(0xFF18181B),
       body: Stack(
         children: [
-          // Background Image
           Positioned.fill(
-            child: Image.asset('assets/images/main.png', fit: BoxFit.cover),
+            child: Image.asset('assets/icons/new_main.png', fit: BoxFit.cover),
           ),
 
-          // Content
           SafeArea(
             child: Column(
               children: [
-                // Header
-                _buildHeader(context),
-
-                // Server List
+                _buildHeader(),
                 Expanded(
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
                     ),
-                    itemCount: controller.availableServers.length,
-                    separatorBuilder:
-                        (context, index) => const SizedBox(height: 8),
+                    itemCount: controller.servers.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
-                      final server = controller.availableServers[index];
-                      return _buildServerItem(
-                        controller: controller,
-                        serverName: server.name,
-                        flagPath: server.flagPath,
-                      );
+                      final server = controller.servers[index];
+                      // Bọc từng item trong Obx để chỉ rebuild item được chọn
+                      return Obx(() {
+                        final isSelected =
+                            server == controller.currentServer.value;
+                        return _buildServerItem(
+                          controller: controller,
+                          server: server,
+                          isSelected: isSelected,
+                        );
+                      });
                     },
                   ),
                 ),
@@ -53,35 +56,18 @@ class VpnServerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          // Back Button
           InkWell(
-            onTap: () => Get.back(),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.arrow_back_ios,
-                    color: Color(0xFF00FFB3),
-                    size: 16,
-                  ),
-                  Icon(
-                    Icons.arrow_back_ios,
-                    color: Color(0xFF00FFB3),
-                    size: 16,
-                  ),
-                ],
-              ),
-            ),
+            onTap: () {
+              Get.back();
+            },
+            child: SvgPicture.asset('assets/icons/back.svg'),
           ),
-          const SizedBox(width: 8),
-          // Title
+          const SizedBox(width: 30),
           const Text(
             'VPN SERVER',
             style: TextStyle(
@@ -99,44 +85,39 @@ class VpnServerScreen extends StatelessWidget {
 
   Widget _buildServerItem({
     required VpnController controller,
-    required String serverName,
-    required String flagPath,
+    required VpnServer server,
+    required bool isSelected,
   }) {
-    return Obx(() {
-      final isSelected = controller.currentServer.value == serverName;
-
-      return InkWell(
-        onTap: () {
-          controller.changeServer(serverName, flagPath);
-          // Auto back to home after selection
-          Future.delayed(const Duration(milliseconds: 300), () {
-            Get.back();
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color:
-                  isSelected
-                      ? const Color(0xFF00FFB3)
-                      // ignore: deprecated_member_use
-                      : const Color(0xFFFFFFFF).withOpacity(0.1),
-              width: isSelected ? 2 : 1,
-            ),
+    return InkWell(
+      onTap: () {
+        controller.selectServer(server);
+        // Auto back to previous screen after selection
+        Future.delayed(const Duration(milliseconds: 200), () => Get.back());
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color:
+                isSelected
+                    ? const Color(0xFF00FFFF)
+                    // ignore: deprecated_member_use
+                    : Colors.white.withOpacity(0.1),
+            width: isSelected ? 2 : 1,
           ),
-          child: Row(
-            children: [
-              // Flag
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.asset(
-                  flagPath,
-                  width: 40,
-                  height: 28,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
+        ),
+        child: Row(
+          children: [
+            // Flag Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.asset(
+                server.flagPath,
+                width: 40,
+                height: 28,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (context, error, stackTrace) => Container(
                       width: 40,
                       height: 28,
                       color: Colors.grey[800],
@@ -145,51 +126,44 @@ class VpnServerScreen extends StatelessWidget {
                         size: 16,
                         color: Colors.grey,
                       ),
-                    );
-                  },
+                    ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Server Name
+            Expanded(
+              child: Text(
+                server.name,
+                style: TextStyle(
+                  fontFamily: 'Play',
+                  color: isSelected ? Colors.white : Colors.grey[300],
+                  fontSize: 16,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
-              const SizedBox(width: 16),
-
-              // Server Name
-              Expanded(
-                child: Text(
-                  serverName,
-                  style: TextStyle(
-                    fontFamily: 'Play',
-                    color: isSelected ? Colors.white : Colors.grey[300],
-                    fontSize: 16,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ),
-
-              // Checkbox
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color:
-                        isSelected
-                            ? const Color(0xFF00FFB3)
-                            : Colors.grey[600]!,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(4),
+            ),
+            // Checkbox
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                border: Border.all(
                   color:
-                      isSelected ? const Color(0xFF00FFB3) : Colors.transparent,
+                      isSelected ? const Color(0xFF00FFFF) : Colors.grey[600]!,
+                  width: 2,
                 ),
-                child:
-                    isSelected
-                        ? const Icon(Icons.check, size: 16, color: Colors.black)
-                        : null,
+
+                color:
+                    isSelected ? const Color(0xFF00FFFF) : Colors.transparent,
               ),
-            ],
-          ),
+              child:
+                  isSelected
+                      ? const Icon(Icons.check, size: 16, color: Colors.black)
+                      : null,
+            ),
+          ],
         ),
-      );
-    });
+      ),
+    );
   }
 }

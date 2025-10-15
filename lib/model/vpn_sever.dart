@@ -2,11 +2,13 @@ class VpnServer {
   final String name;
   final String flagPath;
   final String countryCode;
+  final String vpnPath;
 
   VpnServer({
     required this.name,
     required this.flagPath,
     required this.countryCode,
+    required this.vpnPath
   });
 
   // Danh sách server mặc định
@@ -15,32 +17,38 @@ class VpnServer {
       VpnServer(
         name: 'Germany',
         flagPath: 'assets/flags/de.png',
-        countryCode: 'DE',
+        countryCode: 'DE', 
+        vpnPath: 'assets/vpn/vpn-germany5.ovpn',
       ),
       VpnServer(
         name: 'USA',
         flagPath: 'assets/flags/us.png',
-        countryCode: 'US',
+        countryCode: 'US', 
+        vpnPath: 'assets/vpn/vpn-US.ovpn',
       ),
       VpnServer(
         name: 'United Kingdom',
         flagPath: 'assets/flags/gb-eng.png',
         countryCode: 'UK',
+         vpnPath: 'assets/vpn/vpn-UK.ovpn',
       ),
       VpnServer(
         name: 'France',
         flagPath: 'assets/flags/fr.png',
         countryCode: 'FR',
+         vpnPath: 'assets/vpn/vpn-francectb.ovpn',
       ),
       VpnServer(
         name: 'Singapore',
         flagPath: 'assets/flags/sg.png',
         countryCode: 'SG',
+         vpnPath: 'assets/vpn/vpn-singapore5.ovpn',
       ),
       VpnServer(
         name: 'Canada',
         flagPath: 'assets/flags/ca.png',
-        countryCode: 'CA',
+        countryCode: 'CA', 
+        vpnPath: 'assets/vpn/vpn-canada.ovpn',
       ),
     ];
   }
@@ -56,6 +64,7 @@ class VpnServer {
       name: json['name'] ?? '',
       flagPath: json['flagPath'] ?? '',
       countryCode: json['countryCode'] ?? '',
+      vpnPath: json['vpnPath']??''
     );
   }
 

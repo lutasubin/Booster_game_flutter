@@ -22,7 +22,7 @@ class GameModeSelectionScreen extends StatelessWidget {
         children: [
           // Background Image
           Positioned.fill(
-            child: Image.asset('assets/images/main.png', fit: BoxFit.cover),
+            child: Image.asset('assets/icons/new_main.png', fit: BoxFit.cover),
           ),
 
           // Content
@@ -84,7 +84,7 @@ class GameModeSelectionScreen extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -101,6 +101,13 @@ class GameModeSelectionScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
+
+          if (showPlayButton) ...[
+            Text(
+              'Everything is ready to launch the game application.',
+              style: TextStyle(fontFamily: 'Play', color: Color(0xFF00FFFF)),
+            ),
+          ],
           const SizedBox(height: 40),
 
           // Enhanced feature list sử dụng tất cả data từ controller
@@ -161,11 +168,7 @@ class GameModeSelectionScreen extends StatelessWidget {
                 width: double.infinity,
                 child: InkWell(
                   onTap: () {
-                    // AdHelper.showInterstitialAd(
-                    //   onComplete: () {
-                    //     Get.off(() => AppSelectionScreen());
-                    //   },
-                    // );
+                    Get.back();
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -174,19 +177,19 @@ class GameModeSelectionScreen extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: const Color(0xFF00FFB3),
+                        color: const Color(0xFF00FFFF),
                         width: 1.5,
                       ),
                       color: Colors.transparent,
                     ),
                     child: Center(
                       child: Text(
-                        "Boosting done, close the app and open your game",
+                        "Success",
                         style: const TextStyle(
                           fontFamily: 'Play',
-                          fontSize: 14,
-                          color: Color(0xFF00FFB3),
-                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                          color: Color(0xFF00FFFF),
+                          fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),

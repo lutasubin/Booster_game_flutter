@@ -1,30 +1,44 @@
 import 'dart:async';
 import 'package:booster_game/model/vpn_sever.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:openvpn_flutter/openvpn_flutter.dart';
 
 class VpnController extends GetxController {
-  /// Trạng thái VPN (true = đang kết nối, false = ngắt kết nối)
+  /// Trạng thái VPN
   var isVpnConnected = false.obs;
 
   /// Server hiện tại
-  var currentServer = "Germany".obs;
-  var currentFlag = "assets/flags/de.png".obs;
+  var currentServer = VpnServer.getDefaultServers().first.obs;
 
-  /// Thời gian kết nối (format: HH:MM:SS)
+  /// Thời gian kết nối dạng HH:MM:SS
   var connectionTime = '00:00:00'.obs;
 
-  /// Timer để đếm thời gian kết nối
+  /// Log & Stage VPN
+  var vpnLog = ''.obs;
+  var vpnStage = VPNStage.disconnected.obs;
+
+  /// Timer đếm thời gian
   Timer? _connectionTimer;
   int _secondsElapsed = 0;
 
-  /// Danh sách servers có sẵn
-  List<VpnServer> availableServers = [];
+  /// OpenVPN instance
+  late OpenVPN openvpn;
 
   @override
   void onInit() {
     super.onInit();
-    // Load danh sách servers
-    availableServers = VpnServer.getDefaultServers();
+
+    openvpn = OpenVPN(
+      onVpnStatusChanged: _onVpnStatusChanged,
+      onVpnStageChanged: _onVpnStageChanged,
+    );
+
+    openvpn.initialize(
+      groupIdentifier: "group.com.example.vpn",
+      providerBundleIdentifier: "id.example.vpn.VPNExtension",
+      localizedDescription: "Example VPN",
+    );
   }
 
   @override
@@ -33,56 +47,89 @@ class VpnController extends GetxController {
     super.onClose();
   }
 
-  /// Toggle VPN On/Off
-  void toggleVpn(bool status) {
-    isVpnConnected.value = status;
+  /// Xử lý trạng thái chi tiết VPN
+  void _onVpnStatusChanged(VpnStatus? status) {
+    // Bạn có thể lưu log download/upload, packets, duration nếu muốn
+  }
 
-    if (status) {
-      // Bật VPN - bắt đầu đếm thời gian
+  /// Xử lý stage & log
+  void _onVpnStageChanged(VPNStage stage, String log) {
+    vpnLog.value = log;
+
+    if (stage == VPNStage.connected) {
+      vpnStage.value = VPNStage.connected;
+      isVpnConnected.value = true;
       _startTimer();
-      // TODO: Add your VPN connect logic here
-      // Example: await vpnService.connect(currentServer.value);
-    } else {
-      // Tắt VPN - dừng và reset timer
+    } else if (stage == VPNStage.disconnected) {
+      vpnStage.value = VPNStage.disconnected;
+      isVpnConnected.value = false;
       _stopTimer();
-      // TODO: Add your VPN disconnect logic here
-      // Example: await vpnService.disconnect();
+    }
+    // Không gán connecting ở đây
+  }
+
+  /// Connect VPN từ server hiện tại
+  Future<void> connect() async {
+    try {
+      // Cập nhật trạng thái connecting để UI hiện
+      vpnStage.value = VPNStage.connecting;
+
+      // Delay nhỏ để UI kịp rebuild trạng thái connecting
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      final config = await rootBundle.loadString(currentServer.value.vpnPath);
+
+      openvpn.connect(
+        config,
+        'MyVPN',
+        username: '',
+        password: '',
+        bypassPackages: [],
+        certIsRequired: false,
+      );
+    } catch (e) {
+      vpnLog.value = 'Lỗi load config: $e';
+      vpnStage.value = VPNStage.disconnected;
     }
   }
 
-  /// Đổi server
-  void changeServer(String serverName, String flagPath) {
-    currentServer.value = serverName;
-    currentFlag.value = flagPath;
+  /// Disconnect VPN
+  void disconnect() {
+    openvpn.disconnect();
+  }
+
+  /// Toggle VPN On/Off
+  void toggleVpn() {
+    if (isVpnConnected.value) {
+      disconnect();
+    } else {
+      connect();
+    }
+  }
+
+  /// Chọn server mới
+  void selectServer(VpnServer server) {
+    currentServer.value = server;
 
     // Nếu đang kết nối, reconnect với server mới
     if (isVpnConnected.value) {
-      _reconnect();
+      disconnect();
+      Future.delayed(const Duration(milliseconds: 500), () => connect());
     }
   }
 
-  /// Chọn server theo object VpnServer
-  void selectServer(VpnServer server) {
-    changeServer(server.name, server.flagPath);
-  }
-
-  /// Bắt đầu đếm thời gian kết nối
+  /// Timer đếm thời gian kết nối
   void _startTimer() {
-    // Reset về 0 trước khi bắt đầu
     _secondsElapsed = 0;
     connectionTime.value = '00:00:00';
 
-    // Tạo timer đếm mỗi giây
-    _connectionTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        _secondsElapsed++;
-        connectionTime.value = _formatTime(_secondsElapsed);
-      },
-    );
+    _connectionTimer?.cancel();
+    _connectionTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _secondsElapsed++;
+      connectionTime.value = _formatTime(_secondsElapsed);
+    });
   }
 
-  /// Dừng và reset timer
   void _stopTimer() {
     _connectionTimer?.cancel();
     _connectionTimer = null;
@@ -90,52 +137,15 @@ class VpnController extends GetxController {
     connectionTime.value = '00:00:00';
   }
 
-  /// Reconnect khi đổi server
-  void _reconnect() {
-    // TODO: Add reconnection logic
-    // Example:
-    // await vpnService.disconnect();
-    // await vpnService.connect(currentServer.value);
-    
-    _stopTimer();
-    // Delay nhỏ để có hiệu ứng reconnect
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (isVpnConnected.value) {
-        _startTimer();
-      }
-    });
-  }
-
-  /// Format giây thành HH:MM:SS
   String _formatTime(int seconds) {
     int hours = seconds ~/ 3600;
     int minutes = (seconds % 3600) ~/ 60;
     int secs = seconds % 60;
-
     return '${hours.toString().padLeft(2, '0')}:'
         '${minutes.toString().padLeft(2, '0')}:'
         '${secs.toString().padLeft(2, '0')}';
   }
 
-  /// Get thời gian kết nối dạng text (để hiển thị)
-  String get connectionDuration => connectionTime.value;
-
-  /// Get số giây đã kết nối
-  int get secondsConnected => _secondsElapsed;
-
-  /// Check xem server có đang được chọn không
-  bool isServerSelected(String serverName) {
-    return currentServer.value == serverName;
-  }
-
-  /// Get current server object
-  VpnServer? get currentServerObject {
-    try {
-      return availableServers.firstWhere(
-        (server) => server.name == currentServer.value,
-      );
-    } catch (e) {
-      return null;
-    }
-  }
+  /// Lấy danh sách server
+  List<VpnServer> get servers => VpnServer.getDefaultServers();
 }

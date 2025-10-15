@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:booster_game/controller/splash_controller/splash_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -17,14 +19,21 @@ class SplashScreen extends StatelessWidget {
           children: [
             Positioned.fill(
               child: Image.asset(
-                'assets/images/Artboard 1 1 (2).png',
+                'assets/images/splash_1.png',
+
                 fit: BoxFit.cover,
               ),
             ),
+            // 👇 Lớp phủ mờ (blur)
             Positioned.fill(
-              child: SvgPicture.asset(
-                'assets/svg/Rectangle 7.svg',
-                fit: BoxFit.cover,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6), // độ mờ (6–12)
+                child: Container(
+                  // ignore: deprecated_member_use
+                  color: Colors.black.withOpacity(
+                    0.5,
+                  ), // thêm chút tối nhẹ nếu muốn
+                ),
               ),
             ),
             Align(
@@ -36,11 +45,11 @@ class SplashScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SvgPicture.asset('assets/icons/icon.svg'),
+                        SvgPicture.asset('assets/icons/main_app.svg'),
                         const SizedBox(height: 24),
-                        SvgPicture.asset('assets/svg/Gaming Mode.svg'),
+                        SvgPicture.asset('assets/icons/text_splash.svg'),
                         const SizedBox(height: 10),
-                        SvgPicture.asset('assets/svg/GAME BOOTER FPS.svg'),
+                        SvgPicture.asset('assets/icons/text2_splash.svg'),
                       ],
                     ),
                   ),
@@ -60,12 +69,12 @@ class SplashScreen extends StatelessWidget {
                               height: 10,
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: const Color(0xFF00FFB3),
+                                  color: const Color(0xFF00FFFF),
                                   width: 2,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF00FFB3)
+                                    color: const Color(0xFF00FFFF)
                                     // ignore: deprecated_member_use
                                     .withOpacity(0.4),
                                     blurRadius: 8,
@@ -86,15 +95,15 @@ class SplashScreen extends StatelessWidget {
                                       decoration: BoxDecoration(
                                         gradient: const LinearGradient(
                                           colors: [
-                                            Color(0xFF00FFB3),
-                                            Color(0xFF00E5A0),
+                                            Color(0xFF00FFFF),
+                                            Color(0xFF00FFFF),
                                             Color(0xFF00FFB3),
                                           ],
                                           stops: [0.0, 0.5, 1.0],
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: const Color(0xFF00FFB3)
+                                            color: const Color(0xFF00FFFF)
                                             // ignore: deprecated_member_use
                                             .withOpacity(glow * 0.8),
                                             blurRadius: 10,
@@ -135,7 +144,7 @@ class SplashScreen extends StatelessWidget {
                             Text(
                               '${(progress * 100).toInt()}%',
                               style: const TextStyle(
-                                color: Color(0xFF00FFB3),
+                                color: Color(0xFF00FFFF),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 1.2,

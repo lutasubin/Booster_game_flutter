@@ -1,4 +1,5 @@
-package com.lutasubin.boostergame
+package com.SpAiMobileToMobileTool.BoosterVpn
+
 
 import android.content.Context
 import android.graphics.Color

@@ -72,6 +72,8 @@ dependencies:
   # storage
   get_storage: ^2.1.1
   android_intent_plus: ^6.0.0
+  openvpn_flutter: ^1.3.4
+  path_provider: ^2.1.5
  
 
 dev_dependencies:
@@ -111,6 +113,7 @@ flutter:
      - assets/svg/ 
      - assets/fonts/
      - assets/flags/
+     - assets/vpn/
 
   # To add fonts to your application, add an fonts section, like this:
   fonts:

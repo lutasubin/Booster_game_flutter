@@ -67,9 +67,8 @@ dependencies:
   google_mobile_ads: ^6.0.0
   firebase_analytics: ^12.0.1
   url_launcher: ^6.3.2
-  package_info_plus: ^9.0.0
 
-  # storage
+  # storage & vpn
   get_storage: ^2.1.1
   android_intent_plus: ^6.0.0
   openvpn_flutter: ^1.3.4
